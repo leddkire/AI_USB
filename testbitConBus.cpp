@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <queue>
+#include <cmath>
 using namespace std;
 
 
@@ -41,6 +42,34 @@ void imprimirEstado(bitset<64> estadoComp){
 	}
 }
 
+int distanciaMan(bitset<64> estado){
+	int distancia = 0;
+	int i2;
+	int j2;
+	for(int i=0 ; i < 4; i++){
+		for(int j=0; j < 4; j++){
+			bitset<4> valor; 
+			for(int k=0; k< 4; k++){
+				valor[3 - k] = estado[63 - i*16 - j*4 - k];
+			}
+			if(valor == 0){
+				continue;
+			}
+			//Transformamos el valor
+			unsigned long int valorI = valor.to_ulong();
+			i2 = valorI / 4;
+			j2 = (valorI % 4);
+			distancia = distancia + (abs(i - i2) + abs(j - j2));
+		}
+
+	}
+
+
+	return distancia;
+}
+
+
+
 class Nodo{
 	
 public:
@@ -48,23 +77,27 @@ public:
 	Nodo* padre;
 	bitset<2> accion; //Accion que produjo este estado a partir del padre
 	int costo;
+	int profundidad;
 	Nodo(){
 		estado = Estado();
 		padre = NULL;
 		accion.reset();
 		costo = -1;
+		profundidad = -1;
 	}
 	Nodo(Estado e){
 		estado = e;
 		padre = NULL;
 		accion = bitset<2>(0);
 		costo = 0;
+		profundidad = 0;
 	}
-	Nodo (Estado e, Nodo *n, bitset<2> a, const int c){
+	Nodo (Estado e, Nodo *n, bitset<2> a, const int c, int p){
 		estado = e;
 		padre = n;
 		accion = a;
 		costo = c;
+		profundidad = p;
 	}
 	
 };
@@ -79,6 +112,7 @@ public:
 		posCero = nodo.estado.ubicacion0.to_ulong();
 		Nodo nuevo;		
 		int c = nodo.costo + 1;
+		int p = nodo.profundidad + 1;
 
 
 		//Revisa cada posible accion (Arriba, Abajo, Izquierda, Derecha)
@@ -93,7 +127,8 @@ public:
 			}
 
 			estadoGenerado = Estado(estadoComp, bitset<4>(posCero-4));
-			nuevo = Nodo(estadoGenerado, &nodo, accion, c);
+			c = c + distanciaMan(estadoComp);
+			nuevo = Nodo(estadoGenerado, &nodo, accion, c, p);
 			sucesores.push_back(nuevo);
 
 
@@ -108,7 +143,8 @@ public:
 				estadoComp.reset(63 - (posCero*4) - 16 - j);
 			}
 			estadoGenerado = Estado(estadoComp, bitset<4>(posCero+4));
-			nuevo = Nodo(estadoGenerado, &nodo, accion,c);
+			c = c + distanciaMan(estadoComp);
+			nuevo = Nodo(estadoGenerado, &nodo, accion,c, p);
 			sucesores.push_back(nuevo);
 
 
@@ -123,7 +159,8 @@ public:
 				estadoComp.reset(63 - (posCero*4) + 4 - j);
 			}
 			estadoGenerado = Estado(estadoComp, bitset<4>(posCero-1));
-			nuevo = Nodo(estadoGenerado, &nodo, accion, c);
+			c = c + distanciaMan(estadoComp);
+			nuevo = Nodo(estadoGenerado, &nodo, accion, c, p);
 			sucesores.push_back(nuevo);
 
 
@@ -138,7 +175,8 @@ public:
 				estadoComp.reset(63 - (posCero*4) - 4 - j);
 			}
 			estadoGenerado = Estado(estadoComp, bitset<4>(posCero+1));
-			nuevo = Nodo(estadoGenerado, &nodo, accion, c);
+			c = c + distanciaMan(estadoComp);
+			nuevo = Nodo(estadoGenerado, &nodo, accion, c, p);
 			sucesores.push_back(nuevo);
 
 
@@ -163,13 +201,6 @@ public:
 };
 
 
-int distanciaMan(bitset<64> estado){
-	int distancia = 0;
-
-
-
-	return distancia;
-}
 
 
 
@@ -186,7 +217,7 @@ int main(){
 	bitset<4> ubicacion0; //Indice donde se encuentra en cuadro blanco
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
-	file.open("15tests.txt");
+	file.open("15testsE.txt");
 	//No olvidar chequeo de errores
 	getline(file,line);
 	//Se construye un sstream a partir de la linea
@@ -252,16 +283,17 @@ int main(){
 	*/
 	////
 	//Creacion del estado objetivo
-	int i = 0;
+	int i = 1;
 	do{
-		
-		estadoGoal = estadoGoal ^ bitset<64>(i);
 		estadoGoal = estadoGoal << 4;
+		estadoGoal = estadoGoal ^ bitset<64>(i);
+		
 		i++;
 	}while(i < 16);
 	cout << "Estado objetivo: \n";
 	imprimirEstado(estadoGoal);
-
+	int dMan = distanciaMan(estadoComp);
+	cout << "Distancia Manhattan: "<< dMan << "\n";
 	//Inicio del algoritmo de busqueda
 	priority_queue<Nodo, vector<Nodo>, comparar> nodos;
 	int profundidadActual = 0;
@@ -275,13 +307,13 @@ int main(){
 
 			Nodo nodo_A_Evaluar = nodos.top();
 			nodos.pop();
-			if(nodo_A_Evaluar.costo > profundidadActual){
-				profundidadActual = nodo_A_Evaluar.costo;
+			if(nodo_A_Evaluar.profundidad > profundidadActual){
+				profundidadActual = nodo_A_Evaluar.profundidad;
 				cout << "En profundidad " << profundidadActual << "\n";
 			}
 			if(nodo_A_Evaluar.estado.matriz == estadoGoal){
 				cout << "Se encontro una solucion \n";
-				cout << "Paso por " << nodo_A_Evaluar.costo << " movimientos \n" ;
+				cout << "Paso por " << nodo_A_Evaluar.profundidad << " movimientos \n" ;
 				return 0;
 			}else{
 				sucesores = succ(nodo_A_Evaluar);
