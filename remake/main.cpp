@@ -160,17 +160,19 @@ int main(){
 	}while(i < 16);
 	cout << "Estado objetivo: \n";
 	//imprimirEstado(estadoGoal);
-	int dMan = distanciaMan(estadoComp);
-	cout << "Distancia Manhattan: "<< dMan << "\n";
+	
+	
 	Estado15P goal = Estado15P(estadoGoal, bitset<4>(0));
 	//Creacion del modelo
 	Modelo15P modelo = Modelo15P(&E_inicial, &goal);
-
+	int dMan = modelo.h(inicial -> estado);
+	cout << "Distancia Manhattan: "<< dMan << "\n";
+	cout << distanciaMan(estadoComp);
 	//Creacion del algoritmo
 	//OJO, SE TIENE QUE PEDIR CUAL ALGORITMO USAR
 	//POR AHORA A*
 
-	idaEstrella alg = idaEstrella(&modelo);
+	aEstrella alg = aEstrella(&modelo);
 	int resultado;
 	resultado = alg.buscar(inicial);
 	cout << resultado << "\n";

@@ -38,6 +38,7 @@ public:
 
 
 class Modelo{
+
 	public:
 		virtual inline ~Modelo() =0 ;
 		virtual Estado* init() = 0;
@@ -45,7 +46,10 @@ class Modelo{
 		virtual vector<ParEstadoAccion> succ(Estado* s) = 0;
 		virtual Estado* operar(Estado* s, Accion* a) = 0;
 		virtual int h(Estado* s) = 0;
-		virtual bool esAccionInversa(Accion* anterior, Accion* aEvaluar) = 0;		
+		virtual bool esAccionInversa(Accion* anterior, Accion* aEvaluar) = 0;
+		virtual size_t calcularHash(Estado* s) = 0;
+		virtual void insertarCerrado(Estado* s) = 0;
+		virtual int estaCerrado(Estado* s) = 0;		
 };
 
 Modelo::~Modelo(){}

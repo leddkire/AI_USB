@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstddef>
 #include <cmath>
+#include <unordered_map>
 
 
 #include <iostream>
@@ -28,10 +29,6 @@ public:
 	}
 
 	int costo(Accion* a){
-
-		
-
-
 		return 1;
 	}
 
@@ -79,6 +76,8 @@ class Modelo15P : public Modelo
 public:
 	Estado15P* inicial;
 	Estado15P* goal;
+	hash<bitset<64>> fHash; //Funcion de hash para el estado
+	unordered_map<size_t,bitset<64>> mHashCerrados; //Mapa donde se colocaran los estados cerrados
 
 	Modelo15P(){
 		inicial = NULL;
@@ -153,6 +152,7 @@ public:
 	//Funcion que determina la heuristica
 	int h(Estado* s){
 		Estado15P* e = static_cast<Estado15P*>(s);
+		bitset<64> estado = e -> matriz;
 		int distancia = 0;
 		int i2;
 		int j2;
@@ -160,19 +160,22 @@ public:
 			for(int j=0; j < 4; j++){
 				bitset<4> valor; 
 				for(int k=0; k< 4; k++){
-					valor[3 - k] = e -> matriz[63 - i*16 - j*4 - k];
+					valor[3 - k] = estado[63 - i*16 - j*4 - k];
 				}
 				if(valor == 0){
 					continue;
 				}
-				//Transformamos el valor
-				unsigned long int valorI = valor.to_ulong();
-				i2 = valorI / 4;
-				j2 = (valorI % 4);
-				distancia = distancia + (abs(i - i2) + abs(j - j2));
-			}
-
+			//Transformamos el valor
+			unsigned long int valorI = valor.to_ulong();
+			i2 = valorI / 4;
+			j2 = (valorI % 4);
+			distancia = distancia + (abs(i - i2) + abs(j - j2));
 		}
+
+	}
+
+
+	return distancia;
 	};
 //INCOMPLETO
 	Estado* operar(Estado* s, Accion* a){
@@ -231,5 +234,25 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	virtual size_t calcularHash(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+		return fHash(e -> matriz);
+
+	}
+
+	int estaCerrado(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+		size_t hash = fHash(e -> matriz);
+		return mHashCerrados.count(hash);
+
+	}
+
+	void insertarCerrado(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+		size_t hash = fHash(e -> matriz);
+		pair<size_t,bitset<64>> parHashEstado (hash,e->matriz);
+		mHashCerrados.insert(parHashEstado);
 	}
 };
