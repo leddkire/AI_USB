@@ -29,29 +29,10 @@ public:
 
 	int costo(Accion* a){
 
-		int distancia = 1;
-		int i2;
-		int j2;
-		for(int i=0 ; i < 4; i++){
-			for(int j=0; j < 4; j++){
-				bitset<4> valor; 
-				for(int k=0; k< 4; k++){
-					valor[3 - k] = matriz[63 - i*16 - j*4 - k];
-				}
-				if(valor == 0){
-					continue;
-				}
-				//Transformamos el valor
-				unsigned long int valorI = valor.to_ulong();
-				i2 = valorI / 4;
-				j2 = (valorI % 4);
-				distancia = distancia + (abs(i - i2) + abs(j - j2));
-			}
-
-		}
+		
 
 
-		return distancia;
+		return 1;
 	}
 
 	void imprimirEstado(){
@@ -169,10 +150,29 @@ public:
 
 		return sucesores;
 	};
-	//Funcion que determina el costo
-	int costo(Estado* s, Accion* a){
-		//Falta la heuristica.
-		return 1;
+	//Funcion que determina la heuristica
+	int h(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+		int distancia = 0;
+		int i2;
+		int j2;
+		for(int i=0 ; i < 4; i++){
+			for(int j=0; j < 4; j++){
+				bitset<4> valor; 
+				for(int k=0; k< 4; k++){
+					valor[3 - k] = e -> matriz[63 - i*16 - j*4 - k];
+				}
+				if(valor == 0){
+					continue;
+				}
+				//Transformamos el valor
+				unsigned long int valorI = valor.to_ulong();
+				i2 = valorI / 4;
+				j2 = (valorI % 4);
+				distancia = distancia + (abs(i - i2) + abs(j - j2));
+			}
+
+		}
 	};
 //INCOMPLETO
 	Estado* operar(Estado* s, Accion* a){

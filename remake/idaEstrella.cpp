@@ -3,6 +3,10 @@
 #include <queue>
 #include <climits>
 
+#include <iostream>
+
+using namespace std;
+
 class idaEstrella:public AlgoritmoBusqueda{
 public:
 	idaEstrella(){
@@ -13,41 +17,68 @@ public:
 		modelo = m;
 	}
 
-	int buscar(Nodo inicial){
-		int profundidad = 0;
-		int resultado = 0;
+	int buscar(Nodo* inicial){
+		int limite = modelo -> h(inicial -> estado);
+		int t;
 		while(1){
-			resultado = busquedaProfundidad(inicial,profundidad);
-			if(resultado){
-				return resultado;
+			t = busquedaProfundidad(inicial,limite);
+			if(t==-1){
+				return -1; //Se encontro una solucion
+			}else if(t == INT_MAX){
+				return -2; //No se encontro una solucion
 			}
-			profundidad++;
+			limite = t;
 		}
 		return 0;
 	}
 
-	int busquedaProfundidad(Nodo nod,int p){
-		vector<Nodo> sucesores;
+	int busquedaProfundidad(Nodo* nod,int l){
+		vector<Nodo*> sucesores;
 		int encontrado;
 		int resultado;
-		if(nod.profundidad > p){
-			return 0;
+		int f;
+
+		f = nod -> costo + modelo -> h(nod -> estado);
+		
+		if(f > l){
+			delete nod;
+			return f;
 		}
-		if(modelo -> is_goal(nod.estado)){
-			return 1;
+		if(modelo -> is_goal(nod -> estado)){
+			return -1;
 		}
 		int min = INT_MAX;
 		sucesores = succ(nod);
 		for(int i = 0; i < sucesores.size();i++){
-			resultado = busquedaProfundidad(sucesores[i], p);
-			if(resultado){
-				return resultado;
+			if(nod -> accion != NULL){
+				if(!(modelo -> esAccionInversa(nod -> accion, sucesores[i] -> accion))){
+					resultado = busquedaProfundidad(sucesores[i], l);
+					if(resultado == -1){
+						sucesores.clear();
+						vector<Nodo*>().swap(sucesores);
+						return -1;
+					}
+					if(resultado < min){
+						min = resultado;
+					}
+				}
+			}else{
+				resultado = busquedaProfundidad(sucesores[i], l);
+				if(resultado == -1){
+					sucesores.clear();
+					vector<Nodo*>().swap(sucesores);
+					return -1;
+				}
+				if(resultado < min){
+					min = resultado;
+				}
 			}
-			if(resultado < min){
-				min = resultado;
-			}
+			
+			
 		}
-		return resultado;
+		
+		
+		return min;
 
 	}
 };

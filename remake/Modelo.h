@@ -44,6 +44,7 @@ class Modelo{
 		virtual bool is_goal(Estado* s) = 0;
 		virtual vector<ParEstadoAccion> succ(Estado* s) = 0;
 		virtual Estado* operar(Estado* s, Accion* a) = 0;
+		virtual int h(Estado* s) = 0;
 		virtual bool esAccionInversa(Accion* anterior, Accion* aEvaluar) = 0;		
 };
 

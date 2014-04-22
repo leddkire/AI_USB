@@ -129,7 +129,7 @@ int main(){
 	cout << "\nEstado Inicial: \n\n";
 	//imprimirEstado(estadoComp);
 	Estado15P E_inicial = Estado15P(estadoComp, ubicacion0);
-	Nodo inicial = Nodo(&E_inicial);
+	Nodo* inicial = new Nodo(&E_inicial);
 	
 	/*
 	cout << "\nAcciones aplicadas (En lo posible en este orden: arriba, abajo, izq, der): \n\n";
@@ -170,10 +170,11 @@ int main(){
 	//OJO, SE TIENE QUE PEDIR CUAL ALGORITMO USAR
 	//POR AHORA A*
 
-	aEstrella alg = aEstrella(&modelo);
+	idaEstrella alg = idaEstrella(&modelo);
 	int resultado;
 	resultado = alg.buscar(inicial);
-	if(resultado == 1){
+	cout << resultado << "\n";
+	if(resultado == -1){
 		cout << "Se encontro una solucion";
 	}
 	return resultado;
