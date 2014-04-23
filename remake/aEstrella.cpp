@@ -51,6 +51,13 @@ public:
 				if(modelo -> is_goal(nodo_A_Evaluar->estado)){
 					cout << "Se encontro una solucion \n";
 					cout << "Paso por " << nodo_A_Evaluar->profundidad << " movimientos \n" ;
+					delete nodo_A_Evaluar;
+					while(!nodos.empty()){
+						nodo_A_Evaluar = nodos.top();
+						nodos.pop();
+						delete nodo_A_Evaluar;
+					}
+					cerrados.clear();
 					return 1;
 				}else{
 					sucesores = succ(nodo_A_Evaluar);
@@ -59,6 +66,7 @@ public:
 						for(int i = 0; i < sucesores.size(); i ++){
 							hash = modelo -> calcularHash(sucesores[i] -> estado);
 							if(cerrados.count(hash) == 1 & sucesores[i]->costo != 0){
+								delete sucesores[i];
 								continue;
 							}
 							sucesores[i] -> f =sucesores[i] -> f + modelo -> h(sucesores[i] -> estado);
@@ -72,6 +80,10 @@ public:
 					}
 					
 				}
+				if(nodo_A_Evaluar ->  accion != NULL){
+					delete nodo_A_Evaluar;
+				}
+				
 			}
 		};
 	}

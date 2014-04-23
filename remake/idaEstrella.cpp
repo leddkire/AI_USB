@@ -61,6 +61,8 @@ public:
 					if(resultado < min){
 						min = resultado;
 					}
+				}else{
+					delete sucesores[i];
 				}
 			}else{
 				resultado = busquedaProfundidad(sucesores[i], l);
