@@ -21,6 +21,7 @@ public:
 		int limite = modelo -> h(inicial -> estado);
 		int t;
 		while(1){
+			cout << limite << "\n";
 			t = busquedaProfundidad(inicial,limite);
 			if(t==-1){
 				return -1; //Se encontro una solucion
@@ -42,6 +43,7 @@ public:
 		
 		if(f > l){
 			delete nod;
+			nod = NULL;
 			return f;
 		}
 		if(modelo -> is_goal(nod -> estado)){
@@ -54,8 +56,6 @@ public:
 				if(!(modelo -> esAccionInversa(nod -> accion, sucesores[i] -> accion))){
 					resultado = busquedaProfundidad(sucesores[i], l);
 					if(resultado == -1){
-						sucesores.clear();
-						vector<Nodo*>().swap(sucesores);
 						return -1;
 					}
 					if(resultado < min){
@@ -65,8 +65,6 @@ public:
 			}else{
 				resultado = busquedaProfundidad(sucesores[i], l);
 				if(resultado == -1){
-					sucesores.clear();
-					vector<Nodo*>().swap(sucesores);
 					return -1;
 				}
 				if(resultado < min){
@@ -76,7 +74,11 @@ public:
 			
 			
 		}
-		
+
+		if(nod -> accion != NULL){
+			delete nod;
+			nod = NULL;
+		}
 		
 		return min;
 

@@ -19,6 +19,7 @@ public:
 	bitset<64> matriz;
 	bitset<4> ubicacion0;
 
+	~Estado15P(){}
 	Estado15P(){
 		matriz.reset();
 		ubicacion0.reset();

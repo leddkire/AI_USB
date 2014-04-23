@@ -14,5 +14,22 @@ int main(){
 	a = new Accion15P();
 	n = new Nodo(e);
 
-	delete n; 
+	vector<Nodo*> nodos;
+
+	nodos.push_back(n);
+	e = new Estado15P();
+	n = new Nodo(e);
+	nodos.push_back(n);
+	e = new Estado15P();
+	n = new Nodo(e);
+	nodos.push_back(n);
+	e = new Estado15P();
+	n = new Nodo(e);
+	nodos.push_back(n);
+	e = new Estado15P();
+	n = new Nodo(e);
+
+	for(int i = 0 ;i <nodos.size(); i++){
+		delete nodos[i];
+	}
 }

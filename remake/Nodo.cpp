@@ -15,7 +15,7 @@ public:
 	Accion* accion;
 	int costo;
 	int profundidad;
-	int f; //Valor producto de el costo mas la heuristica del estado
+	int f; //Valor sumado de el costo mas la heuristica del estado
 	Nodo(){
 		estado = NULL;
 		padre = NULL;
@@ -45,6 +45,7 @@ public:
 	~Nodo(){
 		delete estado;
 		delete accion;
+		padre = NULL;
 	}
 	
 };

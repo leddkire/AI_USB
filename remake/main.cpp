@@ -172,7 +172,7 @@ int main(){
 	//OJO, SE TIENE QUE PEDIR CUAL ALGORITMO USAR
 	//POR AHORA A*
 
-	aEstrella alg = aEstrella(&modelo);
+	idaEstrella alg = idaEstrella(&modelo);
 	int resultado;
 	resultado = alg.buscar(inicial);
 	cout << resultado << "\n";
