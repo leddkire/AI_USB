@@ -6,7 +6,9 @@
 #include <vector>
 #include <cstddef>
 #include <cmath>
+#include <fstream>
 #include <unordered_map>
+#include <queue>
 
 
 #include <iostream>
@@ -149,7 +151,7 @@ public:
 		}
 
 		return sucesores;
-	};
+	}
 	//Funcion que determina la heuristica
 	int h(Estado* s){
 		Estado15P* e = static_cast<Estado15P*>(s);
@@ -177,7 +179,7 @@ public:
 
 
 	return distancia;
-	};
+	}
 //INCOMPLETO
 	Estado* operar(Estado* s, Accion* a){
 		Estado15P estadoGenerado;
@@ -257,3 +259,190 @@ public:
 		mHashCerrados.insert(parHashEstado);
 	}
 };
+
+class Manhattan : public Heuristica{
+public:
+	unordered_map<size_t, int> costos;
+
+	Manhattan() {};
+
+	Manhattan(Estado* inicial) {
+		generarHeuristicas(inicial);
+	};
+
+	void generarHeuristicas(Estado* modelo) {
+		bitset<8> numero;
+		bitset<8> posicion;
+		bitset<8> preLlave;
+		hash<bitset<8>> hash;
+		int v, d, v2, d2, distancia;
+		size_t key;
+
+			//Iteracion que indica a cual numero le calculamos la distancia
+			for(int i=1; i < 16; i++){
+				numero = bitset<8>(i);
+				numero = numero << 4;
+				v = i/4;
+				d = i % 4;
+				//Iteracion que pasa por todas las posiciones posibles para un numero
+				for(int j=0; j < 16; j++){
+					posicion = bitset<8>(j);
+					preLlave = numero ^ posicion;
+					key = hash(preLlave);
+					v2 = j/4;
+					d2 = j%4;
+					distancia = abs(v - v2) + abs(d - d2);
+					costos.insert({key, distancia});
+					printf("Posicion: %d - Distancia: %d\n", j, distancia);
+				}
+			}
+		 
+	};
+};
+
+class PDB : public Heuristica{
+public:
+	unordered_map<size_t, int> costosp1;
+	unordered_map<size_t, int> costosp2;
+	unordered_map<size_t, int> costosp3;
+	PDB() {};
+
+	PDB(Estado* inicial) {
+		generarHeuristicas(inicial);
+	};
+
+	void generarHeuristicas(Estado* inicial) {
+		Estado15P* ini = static_cast<Estado15P*>(inicial);
+		Estado15P* patron1 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P* patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P* patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		patron1 -> matriz <<= 40;
+		patron2 -> matriz <<= 20;
+
+		cout << patron1 -> matriz << "\n";
+		cout << ini -> matriz <<  "\n";
+
+		patron1 -> matriz &= ini->matriz;
+
+		cout << patron1 -> matriz << "\n";
+
+		patron2 -> matriz &= ini->matriz;
+		patron3 -> matriz &= ini->matriz;
+
+		ofstream  archivop1;
+		ofstream archivop2;
+		ofstream archivop3;
+		archivop1.open ("archivop1.txt");
+		archivop2.open("archivop2.txt");
+		archivop3.open("archivo3.txt");
+
+		Modelo15P m = Modelo15P();
+
+
+		queue<pair<Estado15P*,int>> por_revisar;
+		unordered_map<size_t,Estado15P*> cerrados;
+		por_revisar.push(pair<Estado15P*,int>(patron1,0));
+		pair<Estado15P*,int> por_generar;
+		hash<bitset<64>> fHash;
+		vector<ParEstadoAccion> sucesores;
+		size_t jhash;
+		int elCero;
+		//ARCHIVO 1
+		while(!por_revisar.empty()){
+			por_generar = por_revisar.front();
+			por_revisar.pop();
+			sucesores = m.succ(por_generar.first);
+			jhash = m.calcularHash(por_generar.first);
+			cerrados.insert({jhash,por_generar.first});
+
+			//Aqui se guarda en el archivo
+			archivop1 << jhash << " " << por_generar.second << "\n"; 
+			
+			for(int i=0;i < sucesores.size();i++){
+				Accion15P* a15 = static_cast<Accion15P*>(sucesores[i].a);
+				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
+				elCero = e15 -> ubicacion0.to_ulong();
+				if(!(cerrados.count(m.calcularHash(e15) == 1))){
+
+					if((a15 -> accion) == bitset<2>(0)){
+						if( e15 -> matriz[63- elCero*4 - 16] == 0){
+							por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(1)){
+						if( e15 -> matriz[63- elCero*4 -4] == 0){
+							por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(2)){
+						if( e15 -> matriz[63- elCero*4 +4 ] == 0){
+							por_revisar.push(pair<Estado15P*,int>( e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(3)){
+						if( e15 -> matriz[63- elCero*4 + 16] == 0){
+							por_revisar.push(pair<Estado15P*,int>( e15, por_generar.second));
+						}
+					}
+
+						por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second + 1));
+				}else{
+					delete a15;
+					delete e15;
+				}
+					
+					
+			}
+		}
+		cout << "paso";
+		cerrados.clear();
+		sucesores.clear();
+		//ARCHIVO2
+		while(!por_revisar.empty()){
+			por_generar = por_revisar.front();
+			por_revisar.pop();
+			sucesores = m.succ(por_generar.first);
+			jhash = m.calcularHash(por_generar.first);
+			cerrados.insert({jhash,por_generar.first});
+
+			//Aqui se guarda en el archivo
+			archivop2<< jhash << " " << por_generar.second << "\n"; 
+			cout << jhash << " " << por_generar.second << "\n"; 
+			
+			for(int i=0;i < sucesores.size();i++){
+				Accion15P* a15 = static_cast<Accion15P*>(sucesores[i].a);
+				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
+				elCero = e15 -> ubicacion0.to_ulong();
+				if(!(cerrados.count(m.calcularHash(e15) == 1))){
+
+					if((a15 -> accion) == bitset<2>(0)){
+						if( e15 -> matriz[63- elCero*4 - 16] == 0){
+							por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(1)){
+						if( e15 -> matriz[63- elCero*4 -4] == 0){
+							por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(2)){
+						if( e15 -> matriz[63- elCero*4 +4 ] == 0){
+							por_revisar.push(pair<Estado15P*,int>( e15, por_generar.second));
+						}
+					}else if((a15-> accion) == bitset<2>(3)){
+						if( e15 -> matriz[63- elCero*4 + 16] == 0){
+							por_revisar.push(pair<Estado15P*,int>( e15, por_generar.second));
+						}
+					}
+
+						por_revisar.push(pair<Estado15P*,int>(e15, por_generar.second + 1));
+				}
+					
+					
+			}
+		}
+
+		//ARCHIVO3
+			
+
+			archivop1.close();
+			archivop2.close();
+			archivop3.close();
+		};
+		
+	};

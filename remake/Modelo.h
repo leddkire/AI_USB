@@ -53,6 +53,14 @@ class Modelo{
 };
 
 Modelo::~Modelo(){}
+
+class Heuristica{
+
+public:
+	virtual inline ~Heuristica() =0;
+	virtual void generarHeuristicas(Estado* inicial) =0;
+};
+Heuristica::~Heuristica(){}
 #endif
 
 

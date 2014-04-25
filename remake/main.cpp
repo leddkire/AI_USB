@@ -69,6 +69,7 @@ int main(){
 	bitset<64> estadoComp;
 	bitset<64> estadoGoal;
 	bitset<4> ubicacion0; //Indice donde se encuentra en cuadro blanco
+
 	std::chrono::duration<double> tTotal;
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
@@ -133,6 +134,8 @@ while(getline(file,line)){
 	
 	
 	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+
+	PDB p = PDB(goal);
 
 	goal -> imprimirEstado();
 	//Creacion del modelo
