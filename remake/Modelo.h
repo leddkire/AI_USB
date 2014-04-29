@@ -36,12 +36,20 @@ public:
 
 };
 
+class Heuristica{
+
+public:
+	virtual inline ~Heuristica() =0;
+	virtual void generarHeuristicas(Estado* inicial) =0;
+};
+Heuristica::~Heuristica(){}
 
 class Modelo{
 
 	public:
 		virtual inline ~Modelo() =0 ;
 		virtual Estado* init() = 0;
+		virtual int heuristicaEstado(Estado* s) = 0;
 		virtual bool is_goal(Estado* s) = 0;
 		virtual vector<ParEstadoAccion> succ(Estado* s) = 0;
 		virtual Estado* operar(Estado* s, Accion* a) = 0;
@@ -53,14 +61,6 @@ class Modelo{
 };
 
 Modelo::~Modelo(){}
-
-class Heuristica{
-
-public:
-	virtual inline ~Heuristica() =0;
-	virtual void generarHeuristicas(Estado* inicial) =0;
-};
-Heuristica::~Heuristica(){}
 #endif
 
 

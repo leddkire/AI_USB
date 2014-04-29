@@ -8,7 +8,7 @@ Francisco Gamundi
 
 
 
-#include "Modelo15P.cpp" 
+
 
 
 #include "aEstrella.cpp"
@@ -69,6 +69,14 @@ int main(){
 	bitset<64> estadoComp;
 	bitset<64> estadoGoal;
 	bitset<4> ubicacion0; //Indice donde se encuentra en cuadro blanco
+	Estado15P* init;
+	//bitset<64> mascara = bitset<64>(18446744073709551615);
+	//long double dob = 0.0;
+	//cout << "Estimado Prueba" << mascara << "\n";
+	//for(int i=0; i < 64;i++){
+	//	dob = dob + pow(2, i);
+	//}
+	//printf("NUMERO: %LF\n", dob);
 
 	std::chrono::duration<double> tTotal;
 	////
@@ -83,6 +91,7 @@ int main(){
 		
 		i++;
 	}while(i < 16);
+
 
 while(getline(file,line)){
 	//Se construye un sstream a partir de la linea
@@ -107,7 +116,7 @@ while(getline(file,line)){
 
 	}
 	cout << endl;
-
+}
 	//Construccion del estado compactado
 	for (size_t i = 0; i < estadoI.size(); ++i){
 		tile = bitset<64>(estadoI[i]);
@@ -125,6 +134,7 @@ while(getline(file,line)){
 	cout << "\nEstado Inicial: \n\n";
 	//imprimirEstado(estadoComp);
 	Estado15P* E_inicial = new Estado15P(estadoComp, ubicacion0);
+	init = new Estado15P(estadoComp, ubicacion0);
 	Nodo* inicial = new Nodo(E_inicial);
 	
 	
@@ -135,7 +145,7 @@ while(getline(file,line)){
 	
 	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
 
-	PDB p = PDB(goal);
+
 
 	goal -> imprimirEstado();
 	//Creacion del modelo
@@ -151,10 +161,10 @@ while(getline(file,line)){
 
 	
 
-	idaEstrella alg = idaEstrella(&modelo);
+	//aEstrella alg = aEstrella(&modelo);
 	int resultado;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-	resultado = alg.buscar(inicial);
+	//resultado = alg.buscar(inicial);
 
 	chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
 
@@ -163,14 +173,19 @@ while(getline(file,line)){
   	cout << "Tardo " << tiempo_corrida.count() << " segundos.";
   	cout << std::endl;
 
-	cout << resultado << "\n";
+	/*cout << resultado << "\n";
 	if(resultado != -1){
 		cout << "No se encontro una solucion";
-	}
+	}*/
 	estadoI.clear();
 	vector<int>().swap(estadoI);
 	estadoComp.reset();
-}
+
+
+	PDB p = PDB(goal);
+	//Manhattan man = Manhattan(goal);
+	//int esti = man.generarEstimado(init);
+	//printf("Probando estimado: %d\n", esti);
 	cout << "Tiempo de duracion de todas las corridas:" << tTotal.count() << "\n";
 	file.close();
 

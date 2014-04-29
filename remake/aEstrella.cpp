@@ -1,7 +1,7 @@
 //Algoritmo A*
 #include <cstddef>
 #include <unordered_map>
-
+#include "Modelo15P.cpp"
 #include "AlgoritmoBusqueda.cpp"
 
 
@@ -31,6 +31,17 @@ public:
 		vector<Nodo*> sucesores;
 		unordered_map<size_t, Estado*> cerrados;
 		size_t hash;
+		//bitset<64> estadoGoal;
+		//int i = 1;
+		//do{
+		//	estadoGoal = estadoGoal << 4;
+		//	estadoGoal = estadoGoal ^ bitset<64>(i);
+		
+		//i++;
+		//}while(i < 16);
+		//Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+		//goal->imprimirEstado();
+		//Manhattan modelito = Manhattan(goal);
 		Nodo* nodo_A_Evaluar;
 		nodos.push(inicial);
 		
@@ -69,7 +80,9 @@ public:
 								delete sucesores[i];
 								continue;
 							}
-							sucesores[i] -> f =sucesores[i] -> f + modelo -> h(sucesores[i] -> estado);
+							//Calculando la heuristica Manhattan.
+
+							sucesores[i] -> f =sucesores[i] -> f + modelo->heuristicaEstado(sucesores[i] -> estado);
 							nodos.push(sucesores[i]);
 						}
 
