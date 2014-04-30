@@ -18,7 +18,7 @@ public:
 	}
 
 	int buscar(Nodo* inicial){
-		int limite = modelo -> heuristicaEstado(inicial -> estado);
+		int limite = modelo -> h(inicial -> estado);
 		int t;
 		while(1){
 			cout << limite << "\n";
@@ -39,7 +39,7 @@ public:
 		int resultado;
 		int f;
 
-		f = nod -> costo + modelo -> heuristicaEstado(nod -> estado);
+		f = nod -> costo + modelo -> h(nod -> estado);
 		
 		if(f > l){
 			delete nod;
@@ -47,6 +47,7 @@ public:
 			return f;
 		}
 		if(modelo -> is_goal(nod -> estado)){
+			cout << "Profundidad: " << nod -> costo << "\n";
 			return -1;
 		}
 		int min = INT_MAX;
@@ -81,7 +82,6 @@ public:
 			delete nod;
 			nod = NULL;
 		}
-		
 		return min;
 
 	}

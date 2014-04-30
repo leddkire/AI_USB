@@ -152,9 +152,13 @@ public:
 	Estado15P* inicial;
 	Estado15P* goal;
 	hash<bitset<64>> fHash; //Funcion de hash para el estado
+	hash<bitset<40>> fHashPDBA;
 	hash<bitset<68>> fHashPDB;
 	unordered_map<size_t,bitset<64>> mHashCerrados; //Mapa donde se colocaran los estados cerrados
 	Manhattan heuris;
+	unordered_map<size_t,int> map1;
+	unordered_map<size_t,int> map2;
+	unordered_map<size_t,int> map3;
 
 	Modelo15P(){
 		bitset<64> estadoGoal;
@@ -176,6 +180,16 @@ public:
 		inicial = static_cast<Estado15P*>(i);
 		goal = static_cast<Estado15P*>(g);
 		heuris = Manhattan(goal);
+	}
+
+	Modelo15P(Estado* i, Estado* g, unordered_map<size_t,int> m1,
+									unordered_map<size_t,int> m2,
+									unordered_map<size_t,int> m3){
+		inicial = static_cast<Estado15P*>(i);
+		goal = static_cast<Estado15P*>(g);
+		map1 = m1;
+		map2 = m2;
+		map3 = m3;
 	}
 
 	Estado15P leer(int fd){
@@ -243,8 +257,79 @@ public:
 
 		return sucesores;
 	}
+	bitset<40> insertarEnPatron(bitset<40> p, bitset<4> v){
+		p <<= 4;
+		for(int j = 0; j<4 ; j++){
+			p[j] = v[j];
+		}
+	
+
+		return p;
+	}
+
+
 	//Funcion que determina la heuristica
 	int h(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+
+		bitset<40> patron1 = bitset<40>(0);
+		bitset<40> patron2 = bitset<40>(0);
+		bitset<40> patron3 = bitset<40>(0);
+
+		bitset<64> temp = bitset<64>(0);
+		temp.set();
+		temp &= e->matriz;
+
+		//La heuristica esta basada en una pdb dividida en tres patrones
+		// de cinco valores.
+		bitset<4> valor;
+		valor.set();
+		bitset<4> indice;
+		int valorI;
+
+		for(int i = 15; i >= 0; i--){
+
+			//extraer el valor
+			for(int j = 0; j<4 ; j++){
+				valor[j] = temp[j];
+			}
+
+			//extraer la posicion
+			indice = bitset<4>(i);
+			//Determinar en que bitset colocar
+			//Son tres casos
+			// 1<=valor <6
+			// 6<= valor <11
+			// 11<= valor <16
+			valorI = valor.to_ulong();
+			if(valorI >= 1 && valorI < 6){
+				patron1 = insertarEnPatron(patron1,valor);
+				patron1 = insertarEnPatron(patron1,indice);
+			}else if(valorI >= 6 && valorI < 11){
+				patron2 = insertarEnPatron(patron2,valor);
+				patron2 = insertarEnPatron(patron2,indice);
+			}else if(valorI >= 11 && valorI < 16){
+				patron3 = insertarEnPatron(patron3,valor);
+				patron3 = insertarEnPatron(patron3,indice);
+			}
+			temp >>= 4;
+
+		}
+
+		int v1;
+		int v2;
+		int v3;
+
+		v1 = map1.at(fHashPDBA(patron1));
+		v2 = map2.at(fHashPDBA(patron2));
+		v3 = map3.at(fHashPDBA(patron3));
+
+
+
+		//Aqui se calcula el hash de los tres y se busca en las tablas
+		// para los valores.
+		return v1 + v2 + v3;
+		/*
 		Estado15P* e = static_cast<Estado15P*>(s);
 		bitset<64> estado = e -> matriz;
 		int distancia = 0;
@@ -270,6 +355,7 @@ public:
 
 
 	return distancia;
+	*/
 	}
 //INCOMPLETO
 	Estado* operar(Estado* s, Accion* a){
@@ -346,6 +432,38 @@ public:
 		return fHashPDB(valor0);
 	}
 
+	size_t calcularHashPDBArchivo(Estado* s){
+		Estado15P* e = static_cast<Estado15P*>(s);
+
+		bitset<40> patron = bitset<40>(0);
+
+
+		bitset<64> temp = bitset<64>(0);
+		temp.set();
+		temp &= e->matriz;
+
+		bitset<4> valor;
+		valor.set();
+		bitset<4> indice;
+		int valorI;
+
+		for(int i = 15; i >= 0; i--){
+			//extraer el valor
+			for(int j = 0; j<4 ; j++){
+				valor[j] = temp[j];
+			}
+			if(valor != bitset<4>(0)){
+				//extraer la posicion
+				indice = bitset<4>(i);
+				patron = insertarEnPatron(patron,valor);
+				patron = insertarEnPatron(patron,indice);
+			}
+			temp >>= 4;
+		}
+		return fHashPDBA(patron);
+
+	}
+
 	int estaCerrado(Estado* s){
 		Estado15P* e = static_cast<Estado15P*>(s);
 		size_t hash = fHash(e -> matriz);
@@ -380,16 +498,13 @@ public:
 		Estado15P* patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
 		Estado15P* patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
 		bitset<64> patronson = bitset<64>(15);
+		unordered_map<size_t,bitset<1>> ya_escritos;
+
 		patron1 -> matriz <<= 40;
 		patron2 -> matriz <<= 20;
 
-		cout << patron1 -> matriz << "\n";
-		cout << ini -> matriz <<  "\n";
 
 		patron1 -> matriz &= ini->matriz;
-
-		cout << patron1 -> matriz << "\n";
-
 		patron2 -> matriz &= ini->matriz;
 		patron3 -> matriz &= ini->matriz;
 
@@ -398,7 +513,7 @@ public:
 		ofstream archivop3;
 		archivop1.open ("archivop1.txt");
 		archivop2.open("archivop2.txt");
-		archivop3.open("archivo3.txt");
+		archivop3.open("archivop3.txt");
 
 		Modelo15P m = Modelo15P();
 
@@ -412,8 +527,8 @@ public:
 		size_t jhash;
 		int elCero, i = 0;
 		por_revisar.push(pair<Estado15P*,int>(patron1,0));
-		jhash = m.calcularHashPDB(patron1);
-		cerrados.insert({jhash,patron1});
+		jhash = m.calcularHashPDBArchivo(patron1);
+		cerrados.insert({m.calcularHashPDB(patron1),patron1});
 		archivop1 << jhash << " " << 0 << "\n";
 		//ARCHIVO 1
 		while(!por_revisar.empty()){
@@ -512,9 +627,15 @@ public:
 							por_revisar.push(pair<Estado15P*,int>(e15, costo));
 						}
 					}
-					jhash = m.calcularHashPDB(e15);
-					cerrados.insert({jhash,e15});
-					archivop1 << jhash << " " << costo << "\n";
+					jhash = m.calcularHashPDBArchivo(e15);
+					cerrados.insert({m.calcularHashPDB(e15),e15});
+
+					if(ya_escritos.count(jhash) == 0){
+						ya_escritos.insert({jhash,bitset<1>(0)});
+						archivop1 << jhash << " " << costo << "\n";
+					}
+
+					
 					
 				}else{
 					delete a15;
@@ -527,13 +648,14 @@ public:
 		cout << "paso2\n";
 		cerrados.clear();
 		sucesores.clear();
+		ya_escritos.clear();
 		queue<pair<Estado15P*,int>>().swap(por_revisar);
 		vector<ParEstadoAccion>().swap(sucesores);
 
 		//ARCHIVO2
 		por_revisar.push(pair<Estado15P*,int>(patron2,0));
-		jhash = m.calcularHashPDB(patron2);
-		cerrados.insert({jhash,patron2});
+		jhash = m.calcularHashPDBArchivo(patron2);
+		cerrados.insert({m.calcularHashPDB(patron2),patron2});
 		archivop2 << jhash << " " << 0 << "\n";
 		//ARCHIVO 1
 		while(!por_revisar.empty()){
@@ -632,9 +754,12 @@ public:
 							por_revisar.push(pair<Estado15P*,int>(e15, costo));
 						}
 					}
-					jhash = m.calcularHashPDB(e15);
-					cerrados.insert({jhash,e15});
-					archivop2 << jhash << " " << costo << "\n";
+					jhash = m.calcularHashPDBArchivo(e15);
+					cerrados.insert({m.calcularHashPDB(e15),e15});
+					if(ya_escritos.count(jhash) == 0){
+						ya_escritos.insert({jhash,bitset<1>(0)});
+						archivop2 << jhash << " " << costo << "\n";
+					}
 					
 				}else{
 					delete a15;
@@ -647,13 +772,14 @@ public:
 		cout << "paso al 3\n";
 		cerrados.clear();
 		sucesores.clear();
+		ya_escritos.clear();
 		queue<pair<Estado15P*,int>>().swap(por_revisar);
 		vector<ParEstadoAccion>().swap(sucesores);
 
 		//ARCHIVO3
 		por_revisar.push(pair<Estado15P*,int>(patron3,0));
-		jhash = m.calcularHashPDB(patron3);
-		cerrados.insert({jhash,patron3});
+		jhash = m.calcularHashPDBArchivo(patron3);
+		cerrados.insert({m.calcularHashPDB(patron3),patron3});
 		archivop3 << jhash << " " << 0 << "\n";
 		//ARCHIVO 1
 		while(!por_revisar.empty()){
@@ -752,9 +878,12 @@ public:
 							por_revisar.push(pair<Estado15P*,int>(e15, costo));
 						}
 					}
-					jhash = m.calcularHashPDB(e15);
-					cerrados.insert({jhash,e15});
-					archivop3 << jhash << " " << costo << "\n";
+					jhash = m.calcularHashPDBArchivo(e15);
+					cerrados.insert({m.calcularHashPDB(e15),e15});
+					if(ya_escritos.count(jhash) == 0){
+						ya_escritos.insert({jhash,bitset<1>(0)});
+						archivop3 << jhash << " " << costo << "\n";
+					}
 					
 				}else{
 					delete a15;

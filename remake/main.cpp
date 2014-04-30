@@ -70,6 +70,67 @@ int main(){
 	bitset<64> estadoGoal;
 	bitset<4> ubicacion0; //Indice donde se encuentra en cuadro blanco
 	Estado15P* init;
+
+	//Maps para los tres patrones
+	unordered_map<size_t,int> tabla1;
+	unordered_map<size_t,int> tabla2;
+	unordered_map<size_t,int> tabla3;
+
+	size_t hash;
+	int costo;
+
+	ifstream p1;
+	ifstream p2;
+	ifstream p3;
+
+	int i = 1;
+	do{
+		estadoGoal = estadoGoal << 4;
+		estadoGoal = estadoGoal ^ bitset<64>(i);
+		
+		i++;
+	}while(i < 16);
+
+
+	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+
+
+	cout<< "Generando tablas... \n";
+	//PDB p = PDB(goal);
+
+	cout << "Cargando las tablas...\n";
+
+	p1.open("archivop1.txt");
+	while(getline(p1,line)){
+		stringstream str(line);
+		str >> hash;
+
+		str >> costo;
+
+		tabla1.insert({hash,costo});
+		
+	}
+	p1.close();
+
+	p2.open("archivop2.txt");
+	while(getline(p2,line)){
+		stringstream str(line);
+		str >> hash;
+		str >> costo;
+		tabla2.insert({hash,costo});
+		
+	}
+	p2.close();
+	p3.open("archivop3.txt");
+	while(getline(p3,line)){
+		stringstream str(line);
+		str >> hash;
+		str >> costo;
+		tabla3.insert({hash,costo});
+		
+	}
+	p3.close();
+	cout<< "Se cargaron las tablas" << "\n";
 	//bitset<64> mascara = bitset<64>(18446744073709551615);
 	//long double dob = 0.0;
 	//cout << "Estimado Prueba" << mascara << "\n";
@@ -81,17 +142,10 @@ int main(){
 	std::chrono::duration<double> tTotal;
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
-	file.open("15testsE.txt");
+	file.open("15tests.txt");
 	//No olvidar chequeo de errores
 
-	int i = 1;
-	do{
-		estadoGoal = estadoGoal << 4;
-		estadoGoal = estadoGoal ^ bitset<64>(i);
-		
-		i++;
-	}while(i < 16);
-
+	
 
 while(getline(file,line)){
 	//Se construye un sstream a partir de la linea
@@ -116,7 +170,7 @@ while(getline(file,line)){
 
 	}
 	cout << endl;
-}
+
 	//Construccion del estado compactado
 	for (size_t i = 0; i < estadoI.size(); ++i){
 		tile = bitset<64>(estadoI[i]);
@@ -149,7 +203,7 @@ while(getline(file,line)){
 
 	goal -> imprimirEstado();
 	//Creacion del modelo
-	Modelo15P modelo = Modelo15P(E_inicial, goal);
+	Modelo15P modelo = Modelo15P(E_inicial, goal, tabla1, tabla2, tabla3);
 
 
 	int dMan = modelo.h(inicial -> estado);
@@ -161,10 +215,10 @@ while(getline(file,line)){
 
 	
 
-	//aEstrella alg = aEstrella(&modelo);
+	aEstrella alg = aEstrella(&modelo);
 	int resultado;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-	//resultado = alg.buscar(inicial);
+	resultado = alg.buscar(inicial);
 
 	chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
 
@@ -173,16 +227,18 @@ while(getline(file,line)){
   	cout << "Tardo " << tiempo_corrida.count() << " segundos.";
   	cout << std::endl;
 
-	/*cout << resultado << "\n";
+	cout << resultado << "\n";
 	if(resultado != -1){
 		cout << "No se encontro una solucion";
-	}*/
+	}
 	estadoI.clear();
 	vector<int>().swap(estadoI);
 	estadoComp.reset();
 
+}
+	
 
-	PDB p = PDB(goal);
+	
 	//Manhattan man = Manhattan(goal);
 	//int esti = man.generarEstimado(init);
 	//printf("Probando estimado: %d\n", esti);

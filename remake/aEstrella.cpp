@@ -82,7 +82,7 @@ public:
 							}
 							//Calculando la heuristica Manhattan.
 
-							sucesores[i] -> f =sucesores[i] -> f + modelo->heuristicaEstado(sucesores[i] -> estado);
+							sucesores[i] -> f =sucesores[i] -> f + modelo->h(sucesores[i] -> estado);
 							nodos.push(sucesores[i]);
 						}
 
