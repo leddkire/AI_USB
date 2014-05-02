@@ -110,6 +110,7 @@ int main(){
 		tabla1.insert({hash,costo});
 		
 	}
+	
 	p1.close();
 
 	p2.open("archivop2.txt");
@@ -120,6 +121,7 @@ int main(){
 		tabla2.insert({hash,costo});
 		
 	}
+
 	p2.close();
 	p3.open("archivop3.txt");
 	while(getline(p3,line)){
@@ -151,7 +153,7 @@ while(getline(file,line)){
 	//Se construye un sstream a partir de la linea
 	//Para poder convertir la linea en un arreglo de enteros
 	stringstream str(line);
-	cout << "Estado inicial: \n" <<  line << "\n";
+	//cout << "Estado inicial: \n" <<  line << "\n";
 	//Se leen los valores de 'str' y se insertan en el vector
 
 	for (int numero; str >> numero;){
@@ -160,7 +162,7 @@ while(getline(file,line)){
 	}
 
 	//Impresion del vector para comprobar la conversion
-	cout << "\nEstado inicial en base 10:\n";
+	/*cout << "\nEstado inicial en base 10:\n";
 	for (size_t i = 0; i < estadoI.size(); ++i){
 		if(i % 4 == 3){
 			cout << estadoI[i] << "\n";	
@@ -169,7 +171,7 @@ while(getline(file,line)){
 		}
 
 	}
-	cout << endl;
+	cout << endl;*/
 
 	//Construccion del estado compactado
 	for (size_t i = 0; i < estadoI.size(); ++i){
@@ -183,9 +185,9 @@ while(getline(file,line)){
 		}
 	}
 
-	cout <<"\nRepresentacion del estado en base 2 y compactado:\n" << estadoComp << "\n";
+	//cout <<"\nRepresentacion del estado en base 2 y compactado:\n" << estadoComp << "\n";
 	//Creacion del nodo inicial
-	cout << "\nEstado Inicial: \n\n";
+	//cout << "\nEstado Inicial: \n\n";
 	//imprimirEstado(estadoComp);
 	Estado15P* E_inicial = new Estado15P(estadoComp, ubicacion0);
 	init = new Estado15P(estadoComp, ubicacion0);
@@ -201,14 +203,14 @@ while(getline(file,line)){
 
 
 
-	goal -> imprimirEstado();
+	//goal -> imprimirEstado();
 	//Creacion del modelo
 	Modelo15P modelo = Modelo15P(E_inicial, goal, tabla1, tabla2, tabla3);
 
 
 	int dMan = modelo.h(inicial -> estado);
-	cout << "Distancia Manhattan: "<< dMan << "\n";
-	cout << distanciaMan(estadoComp);
+	//cout << "Distancia Manhattan: "<< dMan << "\n";
+	//cout << distanciaMan(estadoComp);
 	//Creacion del algoritmo
 	//OJO, SE TIENE QUE PEDIR CUAL ALGORITMO USAR
 	//POR AHORA A*
@@ -227,10 +229,7 @@ while(getline(file,line)){
   	cout << "Tardo " << tiempo_corrida.count() << " segundos.";
   	cout << std::endl;
 
-	cout << resultado << "\n";
-	if(resultado != -1){
-		cout << "No se encontro una solucion";
-	}
+
 	estadoI.clear();
 	vector<int>().swap(estadoI);
 	estadoComp.reset();

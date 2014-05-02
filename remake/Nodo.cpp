@@ -40,7 +40,7 @@ public:
 		accion = a;
 		costo = n -> costo + (e -> costo(a));
 		profundidad = n -> profundidad + 1;
-		f = costo;
+		f = 0;
 	}
 	~Nodo(){
 		delete estado;
@@ -56,11 +56,9 @@ class comparar{//Clase para la comparacion de costos de nodo
 public:
 	bool operator() (Nodo* izq, Nodo* der) const
 	{
-		if(izq -> f >= der -> f){
-			return true;
-		}else{
-			return false;
-		}
+
+		return izq -> f > der -> f;
+
 	}
 };
 

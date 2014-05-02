@@ -21,7 +21,6 @@ public:
 		int limite = modelo -> h(inicial -> estado);
 		int t;
 		while(1){
-			cout << limite << "\n";
 			t = busquedaProfundidad(inicial,limite);
 			if(t==-1){
 				return -1; //Se encontro una solucion

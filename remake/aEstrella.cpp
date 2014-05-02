@@ -57,11 +57,10 @@ public:
 				cerrados.insert({hash,nodo_A_Evaluar -> estado});
 				if(nodo_A_Evaluar ->profundidad > profundidadActual){
 					profundidadActual = nodo_A_Evaluar->profundidad;
-					cout << "En profundidad " << profundidadActual << "\n";
 				}
 				if(modelo -> is_goal(nodo_A_Evaluar->estado)){
 					cout << "Se encontro una solucion \n";
-					cout << "Paso por " << nodo_A_Evaluar->profundidad << " movimientos \n" ;
+					cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
 					delete nodo_A_Evaluar;
 					while(!nodos.empty()){
 						nodo_A_Evaluar = nodos.top();
@@ -80,9 +79,9 @@ public:
 								delete sucesores[i];
 								continue;
 							}
-							//Calculando la heuristica Manhattan.
+							//Calculando la heuristica.
 
-							sucesores[i] -> f =sucesores[i] -> f + modelo->h(sucesores[i] -> estado);
+							sucesores[i] -> f =sucesores[i] -> costo + modelo->h(sucesores[i] -> estado);
 							nodos.push(sucesores[i]);
 						}
 
