@@ -501,7 +501,7 @@ public:
 
 
 
-	void generarPatron(ofstream& fd, Estado15P* patron, bitset<4> ignorar){
+	void generarPatron(ofstream& fd, Estado15P* patron, int ignorar){
 		bitset<64> patronson = bitset<64>(15);
 		unordered_map<size_t,bitset<1>> ya_escritos;
 		Modelo15P m = Modelo15P();
@@ -515,6 +515,7 @@ public:
 		size_t ehash;
 		size_t invhash;
 		int elCero, i = 0;
+		int costoI;
 		bitset<5> costo = bitset<5>(0);
 		por_revisar.push(pair<Estado15P*,bitset<5>>(patron,costo));
 /*
@@ -549,20 +550,90 @@ public:
 			for(int i=0;i < sucesores.size();i++){
 				
 				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
+				Accion15P* a15 = static_cast<Accion15P*>(sucesores[i].a);
 				
 				if(cerrados.count(m.calcularHash(e15)) == 0){
 					
 					elCero = e15 -> ubicacion0.to_ulong();
-					
-						if( ehash == invhash){
+			
+					if((a15 -> accion) == bitset<2>(0)){
+						//printf("La accion fue: ");
+						//cout << a15 -> accion << "\n";
+						posDelCero= (63- elCero*4 - 16) - 3;
+						//printf("POS DEL CERO %d \n", posDelCero);
+						temporal = (e15-> matriz) >> posDelCero;
+						temporal &= patronson;
+						posDelCero= temporal.to_ulong();
+						//printf("QUE HABIA DONDE ELCERO: %d\n", posDelCero);
+						if( posDelCero == ignorar){
+							//printf("La posicion del cero ES blanco\n");
 							costo = por_generar.second;
 							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
 						}else{
+							//printf("La posicion del cero no es blanco\n");
+
 							costoI = por_generar.second.to_ulong();
 							costo = bitset<5>(costoI + 1);
 							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
-							
 						}
+					}else if((a15-> accion) == bitset<2>(1)){
+						//printf("La accion fue: ");
+						//cout << a15 -> accion << "\n";
+						posDelCero= (63- elCero*4 - 4) - 3;
+						//printf("POS DEL CERO %d \n", posDelCero);
+						temporal = (e15-> matriz) >> posDelCero;
+						temporal &= patronson;
+						//posDelCero= temporal.to_ulong();
+						//printf("QUE HABIA DONDE ELCERO: %d\n", posDelCero);
+						if( posDelCero == ignorar){
+							//printf("La posicion del cero ES blanco\n");
+							costo = por_generar.second;
+							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
+						}else{
+							//printf("La posicion del cero no es blanco\n");
+							costoI = por_generar.second.to_ulong();
+							costo = bitset<5>(costoI + 1);
+							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
+						}
+					}else if((a15-> accion) == bitset<2>(2)){
+						//printf("La accion fue: ");
+						//cout << a15 -> accion << "\n";
+						posDelCero= (63- elCero*4 + 4) - 3;
+						//printf("POS DEL CERO %d \n", posDelCero);
+						temporal = (e15-> matriz) >> posDelCero;
+						temporal &= patronson;
+						posDelCero= temporal.to_ulong();
+						//printf("QUE HABIA DONDE ELCERO: %d\n", posDelCero);
+						if( posDelCero == ignorar){
+							//printf("La posicion del cero ES blanco\n");
+							costo = por_generar.second;
+							por_revisar.push(pair<Estado15P*,bitset<5>>( e15, costo));
+						}else{
+							//printf("La posicion del cero no es blanco\n");
+							costoI = por_generar.second.to_ulong();
+							costo = bitset<5>(costoI + 1);
+							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
+						}
+					}else if((a15-> accion) == bitset<2>(3)){
+						//printf("La accion fue: ");
+						//cout << a15 -> accion << "\n";
+						posDelCero= (63- elCero*4 + 16) - 3;
+						//printf("POS DEL CERO %d \n", posDelCero);
+						temporal = (e15-> matriz) >> posDelCero;
+						temporal &= patronson;
+						posDelCero= temporal.to_ulong();
+						//printf("QUE HABIA DONDE ELCERO: %d\n", posDelCero);
+						if( posDelCero == ignorar){
+							//printf("La posicion del cero ES blanco\n");
+							costo = por_generar.second;
+							por_revisar.push(pair<Estado15P*,bitset<5>>( e15, costo));
+						}else{
+							//printf("La posicion del cero no es blanco\n");
+							costoI = por_generar.second.to_ulong();
+							costo = bitset<5>(costoI + 1);
+							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
+						}
+					}
 
 						cerrados.insert({m.calcularHash(e15),bitset<1>(0)});
 				}else{
@@ -570,6 +641,7 @@ public:
 					delete e15;
 
 				}
+				delete a15;
 				delete sucesores[i].a;
 
 			}
@@ -642,14 +714,14 @@ public:
 
 		
 		//ARCHIVO 1
-		generarPatron(archivop1,patron1, ignorar1);
+		generarPatron(archivop1,patron1, ignorar1.to_ulong());
 		cout << "paso1\n";
 		//ARCHIVO2
-		generarPatron(archivop2,patron2, ignorar2);
+		generarPatron(archivop2,patron2, ignorar2.to_ulong());
 		cout << "paso2\n";
 		
 		//ARCHIVO3
-		generarPatron(archivop3,patron3, ignorar3);
+		generarPatron(archivop3,patron3, ignorar3.to_ulong());
 		cout << "paso3\n";
 
 			archivop1.close();
