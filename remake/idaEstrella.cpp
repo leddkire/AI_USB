@@ -27,6 +27,7 @@ public:
 			}else if(t == INT_MAX){
 				return -2; //No se encontro una solucion
 			}
+			cout << "Limite: "<< t << "\n";
 			limite = t;
 		}
 		return 0;
@@ -37,8 +38,12 @@ public:
 		int encontrado;
 		int resultado;
 		int f;
+		int hh;
 
-		f = nod -> costo + modelo -> h(nod -> estado);
+		hh = modelo -> h(nod -> estado);
+
+		f = nod -> costo + hh;
+		
 		
 		if(f > l){
 			delete nod;

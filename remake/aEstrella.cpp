@@ -80,7 +80,7 @@ public:
 								continue;
 							}
 							//Calculando la heuristica.
-
+							
 							sucesores[i] -> f =sucesores[i] -> costo + modelo->h(sucesores[i] -> estado);
 							nodos.push(sucesores[i]);
 						}

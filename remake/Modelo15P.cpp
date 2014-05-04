@@ -283,7 +283,6 @@ public:
 		//La heuristica esta basada en una pdb dividida en tres patrones
 		// de cinco valores.
 		bitset<4> valor;
-		valor.set();
 		bitset<4> indice;
 		int valorI;
 
@@ -443,7 +442,6 @@ public:
 		temp &= e->matriz;
 
 		bitset<4> valor;
-		valor.set();
 		bitset<4> indice;
 		int valorI;
 
@@ -492,12 +490,23 @@ public:
 		generarHeuristicas(inicial);
 	};
 
-	void generarPatron(ofstream& fd, Estado15P* patron){
+	bitset<4> extraerValor(bitset<64> matriz, int i){
+		bitset<4> valor;
+		for(int j = 0; j < 4 ; j++){
+			valor[j] = matriz[i];
+			i++;
+		}
+		return valor;
+	}
+
+
+
+	void generarPatron(ofstream& fd, Estado15P* patron, bitset<4> ignorar){
 		bitset<64> patronson = bitset<64>(15);
 		unordered_map<size_t,bitset<1>> ya_escritos;
 		Modelo15P m = Modelo15P();
 		queue<pair<Estado15P*,bitset<5>>> por_revisar;
-		unordered_multimap<size_t,Estado15P*> cerrados;
+		unordered_multimap<size_t,bitset<1>> cerrados;
 		
 		pair<Estado15P*,bitset<5>> por_generar;
 		short costoI;
@@ -508,13 +517,14 @@ public:
 		int elCero, i = 0;
 		bitset<5> costo = bitset<5>(0);
 		por_revisar.push(pair<Estado15P*,bitset<5>>(patron,costo));
-
+/*
 		jhash = m.calcularHashPDBArchivo(patron);
 		cerrados.insert({m.calcularHashPDB(patron),patron});
 		if(ya_escritos.count(jhash) == 0){
 			ya_escritos.insert({jhash,bitset<1>(0)});
 			fd << jhash << " " << costo.to_ulong() << "\n";
 		}	
+*/
 		//ARCHIVO 1
 		while(!por_revisar.empty()){
 
@@ -529,24 +539,21 @@ public:
 			}
 				
 			
-			
 			invhash = m.calcularHash(por_generar.first);
+
 			sucesores = m.succ(por_generar.first);
+
 			delete por_generar.first;	
 			por_revisar.pop();
-
-
-							
-
 
 			for(int i=0;i < sucesores.size();i++){
 				
 				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
-				delete sucesores[i].a;
-				if(cerrados.count(m.calcularHashPDB(e15)) == 0){
+				
+				if(cerrados.count(m.calcularHash(e15)) == 0){
 					
 					elCero = e15 -> ubicacion0.to_ulong();
-					ehash = m.calcularHash(e15);
+					
 						if( ehash == invhash){
 							costo = por_generar.second;
 							por_revisar.push(pair<Estado15P*,bitset<5>>(e15, costo));
@@ -557,12 +564,13 @@ public:
 							
 						}
 
-						cerrados.insert({m.calcularHashPDB(e15),e15});
+						cerrados.insert({m.calcularHash(e15),bitset<1>(0)});
 				}else{
 					
 					delete e15;
 
 				}
+				delete sucesores[i].a;
 
 			}
 			sucesores.clear();
@@ -575,19 +583,52 @@ public:
 		vector<ParEstadoAccion>().swap(sucesores);
 	}
 
+	void designarValorBlanco(Estado15P* e, bitset<4> ignorar){
+		bitset<4> valor;
+		//Se ignora el cero verdadero, por eso recorre solo 15 posiciones y no 16
+		for(int i = 0; i <15; i++){
+
+			valor = extraerValor(e -> matriz, i*4);
+
+			if(valor.to_ulong() == 0){
+				for(int j = 0; j<4; j++){
+					e->matriz[i*4+j] = ignorar[j];
+				}
+			}
+		}
+
+
+	}
+
 	void generarHeuristicas(Estado* inicial) {
 		Estado15P* ini = static_cast<Estado15P*>(inicial);
 		Estado15P* patron1 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
 		Estado15P* patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
 		Estado15P* patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
-		
+
+		bitset<4> ignorar1;
+		bitset<4> ignorar2;
+		bitset<4> ignorar3;
+
 		patron1 -> matriz <<= 40;
 		patron2 -> matriz <<= 20;
 
+		patron1 -> matriz &= ini -> matriz;
+		patron2 -> matriz &= ini -> matriz;
+		patron3 -> matriz &= ini -> matriz;
 
-		patron1 -> matriz &= ini->matriz;
-		patron2 -> matriz &= ini->matriz;
-		patron3 -> matriz &= ini->matriz;
+		ignorar1 = bitset <4>(15);
+		designarValorBlanco(patron1, ignorar1);
+		ignorar2 = bitset<4>(15);
+		designarValorBlanco(patron2, ignorar2);
+		ignorar3 = bitset<4>(1);
+		designarValorBlanco(patron3, ignorar3);
+
+		patron1 -> imprimirEstado();
+		cout << "\n";
+		patron2 -> imprimirEstado();
+		cout << "\n";
+		patron3 -> imprimirEstado();
 
 		ofstream  archivop1;
 		ofstream archivop2;
@@ -601,13 +642,14 @@ public:
 
 		
 		//ARCHIVO 1
-		generarPatron(archivop1,patron1);
+		generarPatron(archivop1,patron1, ignorar1);
 		cout << "paso1\n";
 		//ARCHIVO2
-		generarPatron(archivop2,patron2);
+		generarPatron(archivop2,patron2, ignorar2);
 		cout << "paso2\n";
+		
 		//ARCHIVO3
-		generarPatron(archivop3,patron3);
+		generarPatron(archivop3,patron3, ignorar3);
 		cout << "paso3\n";
 
 			archivop1.close();

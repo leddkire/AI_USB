@@ -147,9 +147,11 @@ int main(){
 	file.open("15tests.txt");
 	//No olvidar chequeo de errores
 
-	
+int probNum = 1;	
 
 while(getline(file,line)){
+	cout <<"Problema: " << probNum << "\n";
+	probNum++;
 	//Se construye un sstream a partir de la linea
 	//Para poder convertir la linea en un arreglo de enteros
 	stringstream str(line);
