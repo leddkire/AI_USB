@@ -18,6 +18,7 @@ public:
 		for(int i = 0; i < estadosAccion.size(); i++){
 
 			sucesores.push_back(new Nodo(estadosAccion[i].s, n, estadosAccion[i].a));
+			
 		}
 		return sucesores;
 	}
