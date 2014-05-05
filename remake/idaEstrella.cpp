@@ -20,8 +20,9 @@ public:
 	int buscar(Nodo* inicial){
 		int limite = modelo -> h(inicial -> estado);
 		int t;
+		int generados = 0;
 		while(1){
-			t = busquedaProfundidad(inicial,limite);
+			t = busquedaProfundidad(inicial,limite,&generados);
 			if(t==-1){
 				return -1; //Se encontro una solucion
 			}else if(t == INT_MAX){
@@ -32,7 +33,7 @@ public:
 		return 0;
 	}
 
-	int busquedaProfundidad(Nodo* nod,int l){
+	int busquedaProfundidad(Nodo* nod,int l,int* generados){
 		vector<Nodo*> sucesores;
 		int encontrado;
 		int resultado;
@@ -46,15 +47,17 @@ public:
 			return f;
 		}
 		if(modelo -> is_goal(nod -> estado)){
-			cout << "Profundidad: " << nod -> costo << "\n";
+			// cout << "Profundidad: " << nod -> costo << "\n";
+			cout << *generados << " " << nod -> costo << " ";
 			return -1;
 		}
 		int min = INT_MAX;
 		sucesores = succ(nod);
+		*generados = *generados + sucesores.size();
 		for(int i = 0; i < sucesores.size();i++){
 			if(nod -> accion != NULL){
 				if(!(modelo -> esAccionInversa(nod -> accion, sucesores[i] -> accion))){
-					resultado = busquedaProfundidad(sucesores[i], l);
+					resultado = busquedaProfundidad(sucesores[i], l, generados);
 					if(resultado == -1){
 						return -1;
 					}
@@ -65,7 +68,7 @@ public:
 					delete sucesores[i];
 				}
 			}else{
-				resultado = busquedaProfundidad(sucesores[i], l);
+				resultado = busquedaProfundidad(sucesores[i], l, generados);
 				if(resultado == -1){
 					return -1;
 				}

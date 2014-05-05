@@ -61,6 +61,9 @@ int main(){
 	//Declaracion de variables
 	string line; //string para la obtencion de cada estado inicial
 	ifstream file; //stream para leer del archivo
+	ofstream output; //stream para archivo de salida
+	streambuf *coutbuf; // stream para guardar salida standard
+	int id_puzzle;
 //POR AHORA SE INICIALIZAN COMO PARA EL 15-PUZZLE
 //Antes de esto se tiene que preguntar que tipo de problema se quiere resolver
 	vector<int> estadoI; //estructura para almacenar los datos del estado inicial
@@ -147,12 +150,19 @@ int main(){
 	file.open("15tests.txt");
 	//No olvidar chequeo de errores
 
+	coutbuf = cout.rdbuf();
+	output.open("resultados.txt");
+	cout.rdbuf(output.rdbuf()); //Se cambia salida standard al archivo de salida
+	cout << "<id> : <problema> : <limites> <# nodos generados> <profundidad optima> <tiempo> \n";
+	id_puzzle = 000;
+
 	
 
 while(getline(file,line)){
 	//Se construye un sstream a partir de la linea
 	//Para poder convertir la linea en un arreglo de enteros
 	stringstream str(line);
+	cout << ++id_puzzle <<  " : " << line << " : ";
 	//cout << "Estado inicial: \n" <<  line << "\n";
 	//Se leen los valores de 'str' y se insertan en el vector
 
@@ -226,7 +236,8 @@ while(getline(file,line)){
 
   	std::chrono::duration<double> tiempo_corrida = chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
   	tTotal = tTotal + tiempo_corrida;
-  	cout << "Tardo " << tiempo_corrida.count() << " segundos.";
+  	// cout << "Tardo " << tiempo_corrida.count() << " segundos.";
+  	cout << tiempo_corrida.count();
   	cout << std::endl;
 
 
@@ -242,7 +253,9 @@ while(getline(file,line)){
 	//int esti = man.generarEstimado(init);
 	//printf("Probando estimado: %d\n", esti);
 	cout << "Tiempo de duracion de todas las corridas:" << tTotal.count() << "\n";
+	output.close();
 	file.close();
+
 
 	
 
