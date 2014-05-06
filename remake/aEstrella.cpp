@@ -31,6 +31,7 @@ public:
 		vector<Nodo*> sucesores;
 		unordered_map<size_t, Estado*> cerrados;
 		size_t hash;
+		int generados = 0;
 		//bitset<64> estadoGoal;
 		//int i = 1;
 		//do{
@@ -47,7 +48,7 @@ public:
 		
 		while(1){
 			if (nodos.empty()){
-				cout << "No se encontro una solucion \n";
+				cerr << "No se encontro una solucion \n";
 				return 0;
 			}else{
 
@@ -59,8 +60,9 @@ public:
 					profundidadActual = nodo_A_Evaluar->profundidad;
 				}
 				if(modelo -> is_goal(nodo_A_Evaluar->estado)){
-					cout << "Se encontro una solucion \n";
-					cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
+					// cout << "Se encontro una solucion \n";
+					// cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
+					cout << generados << " " << nodo_A_Evaluar->costo<< " ";
 					delete nodo_A_Evaluar;
 					while(!nodos.empty()){
 						nodo_A_Evaluar = nodos.top();
@@ -71,6 +73,7 @@ public:
 					return 1;
 				}else{
 					sucesores = succ(nodo_A_Evaluar);
+					generados = generados + sucesores.size();
 					//Para que no ocurra una referencia a una accion nula con el nodo inicial
 					if(profundidadActual !=0){
 						for(int i = 0; i < sucesores.size(); i ++){
