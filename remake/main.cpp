@@ -219,7 +219,7 @@ while(getline(file,line)){
 
 	
 
-	idaEstrella alg = idaEstrella(&modelo);
+	aEstrella alg = aEstrella(&modelo);
 	int resultado;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
 	resultado = alg.buscar(inicial);

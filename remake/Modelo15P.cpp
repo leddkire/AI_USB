@@ -431,7 +431,7 @@ public:
 		return fHashPDB(valor0);
 	}
 
-	size_t calcularHashPDBArchivo(Estado* s, int ignorar){
+	size_t calcularHashPDBArchivo(Estado* s/*, int ignorar*/){
 		Estado15P* e = static_cast<Estado15P*>(s);
 
 		bitset<40> patron = bitset<40>(0);
@@ -450,7 +450,7 @@ public:
 			for(int j = 0; j<4 ; j++){
 				valor[j] = temp[j];
 			}
-			if(valor != bitset<4>(0) && valor != bitset<4>(ignorar)){
+			if(valor != bitset<4>(0) /*&& valor != bitset<4>(ignorar)*/){
 				//extraer la posicion
 				indice = bitset<4>(i);
 				patron = insertarEnPatron(patron,valor);
@@ -531,7 +531,7 @@ public:
 		bitset<6> costo = bitset<6>(0);
 		por_revisar.push(pair<Estado15P*,bitset<6>>(patron,costo));
 
-		//cerrados.insert({m.calcularHash(patron),bitset<1>(0)});
+		cerrados.insert({m.calcularHashPDB(patron),bitset<1>(0)});
 /*
 		jhash = m.calcularHashPDBArchivo(patron);
 		
@@ -546,13 +546,13 @@ public:
 			por_generar = por_revisar.top();
 			
 			
-			jhash = m.calcularHashPDBArchivo(por_generar.first,ignorar);
+			jhash = m.calcularHashPDBArchivo(por_generar.first);
 							
 			if(ya_escritos.count(jhash) == 0){
 				ya_escritos.insert({jhash,bitset<1>(0)});
 				fd << jhash << " " << por_generar.second.to_ulong() << "\n";
 			}
-				
+			invhash = m.calcularHash(por_generar.first);
 			
 			//cerrados.insert({m.calcularHash(por_generar.first),bitset<1>(0)});
 			sucesores = m.succ(por_generar.first);
@@ -564,9 +564,20 @@ public:
 				
 				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
 				Accion15P* a15 = static_cast<Accion15P*>(sucesores[i].a);
-				
-				if(cerrados.count(m.calcularHash(e15)) == 0){
-					
+				jhash= m.calcularHash(e15);
+
+
+				if(cerrados.count(m.calcularHashPDB(e15)) == 0){
+
+					if(jhash == invhash){
+						costo = por_generar.second;
+						por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+					}else{
+						costoI = por_generar.second.to_ulong();
+						costo = bitset<6>(costoI + 1);
+						por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+					}
+				/*	
 					elCero = e15 -> ubicacion0.to_ulong();
 			
 					if((a15 -> accion) == bitset<2>(0)){
@@ -646,9 +657,9 @@ public:
 							costo = bitset<6>(costoI + 1);
 							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
 						}
-					}
+					}*/
 
-						cerrados.insert({m.calcularHash(e15),bitset<1>(0)});
+						cerrados.insert({m.calcularHashPDB(e15),bitset<1>(0)});
 				}else{	
 					delete e15;
 
@@ -699,14 +710,14 @@ public:
 		patron1 -> matriz &= ini -> matriz;
 		patron2 -> matriz &= ini -> matriz;
 		patron3 -> matriz &= ini -> matriz;
-
+/*
 		ignorar1 = bitset <4>(15);
 		designarValorBlanco(patron1, ignorar1);
 		ignorar2 = bitset<4>(15);
 		designarValorBlanco(patron2, ignorar2);
 		ignorar3 = bitset<4>(1);
 		designarValorBlanco(patron3, ignorar3);
-
+*/
 		patron1 -> imprimirEstado();
 		cout << "\n";
 		patron2 -> imprimirEstado();
