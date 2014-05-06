@@ -13,14 +13,12 @@ public:
 	Estado* estado;
 	Nodo* padre;
 	Accion* accion;
-	int costo;
 	int profundidad;
 	int f; //Valor sumado de el costo mas la heuristica del estado
 	Nodo(){
 		estado = NULL;
 		padre = NULL;
 		accion = NULL;
-		costo = 0;
 		profundidad = -1;
 		f = -1;
 	}
@@ -29,7 +27,6 @@ public:
 		estado = e;
 		padre = NULL;
 		accion = NULL;
-		costo = 0;
 		profundidad = 0;
 		f = 0;
 	}
@@ -38,15 +35,10 @@ public:
 		estado = e;
 		padre = n;
 		accion = a;
-		costo = n -> costo + (e -> costo(a));
 		profundidad = n -> profundidad + 1;
 		f = 0;
 	}
-	~Nodo(){
-		delete estado;
-		delete accion;
-		padre = NULL;
-	}
+
 	
 };
 

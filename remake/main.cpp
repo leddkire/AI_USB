@@ -147,7 +147,7 @@ int main(){
 	std::chrono::duration<double> tTotal;
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
-	file.open("15tests.txt");
+	file.open("15testsE.txt");
 	//No olvidar chequeo de errores
 
 

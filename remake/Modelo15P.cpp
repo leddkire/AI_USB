@@ -1,4 +1,8 @@
 
+#ifndef MODELO15
+#define MODELO15
+
+
 #include "Modelo.h"
 
 
@@ -217,43 +221,81 @@ public:
 
 	vector<ParEstadoAccion> succ(Estado* s){
 		int posCero;
-		Estado* estadoGenerado;
+		Estado* eG;
 		Estado15P* estado = static_cast<Estado15P*>(s);
 		vector<ParEstadoAccion> sucesores;
 		bitset<64> estadoComp;
-		Accion15P a15;
-		Accion* a;
-		
-		posCero = estado -> ubicacion0.to_ulong();
+		bitset<64> valor;
+ 		posCero = estado -> ubicacion0.to_ulong();
+ 		estadoComp = estado -> matriz;
+ 		Accion15P* a;
 
 		//Revisa cada posible accion (Arriba, Abajo, Izquierda, Derecha)
 		//Y efectua el cambio de estado adecuado para luego crear el nodo.
+		//Hacia arriba
 		if(posCero >= 4){
+			estadoComp = estado -> matriz;
 			a = new Accion15P(bitset<2>(0));
-			estadoGenerado = operar(s,a);
-			sucesores.push_back(ParEstadoAccion(a,estadoGenerado));	
-		}
+			valor = (estadoComp >> 64 - posCero*4 + 12) & bitset<64>(15);
+			estadoComp = (valor << 64 - posCero*4 -4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4 +12)));
 
+			/*for(int j = 0 ; j < 4 ; j++){
+				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 16 - j];
+				estadoComp.reset(63 - (posCero*4) + 16 - j);
+			}*/
+			eG = new Estado15P(estadoComp, bitset<4>(posCero-4));
+			sucesores.push_back(ParEstadoAccion(a,eG));
+		}
+		//Hacia abajo
 		if(posCero <= 11){
+			estadoComp = estado -> matriz;
 			a = new Accion15P(bitset<2>(3));
-			
-			estadoGenerado = operar(s,a);
-			sucesores.push_back(ParEstadoAccion(a,estadoGenerado));
-		}
+			valor = (estadoComp >> 64 - posCero*4 - 20) & bitset<64>(15);
+			estadoComp = (valor << 64 - posCero*4 - 4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4- 20)));
 
+			/*for(int j = 0 ; j < 4 ; j++){
+				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 - 16 - j];
+				estadoComp.reset(63 - (posCero*4) - 16 - j);
+			}*/
+			
+			eG = new Estado15P(estadoComp, bitset<4>(posCero+4));
+			sucesores.push_back(ParEstadoAccion(a,eG));	
+		}
+		//Izquierda
 		if(posCero % 4 != 0){
+			estadoComp = estado -> matriz;
 			a =  new Accion15P(bitset<2>(1));
-			
-			estadoGenerado = operar(s,a);
-			sucesores.push_back(ParEstadoAccion(a,estadoGenerado));
-		}
+			valor = (estadoComp >> 64 - posCero*4) & bitset<64>(15);
+			estadoComp = (valor << 64 - posCero*4 - 4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4)));
+			/*for(int j = 0 ; j < 4 ; j++){
+				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 4 - j];
+				estadoComp.reset(63 - (posCero*4) + 4 - j);
+			}*/
+			eG = new Estado15P(estadoComp, bitset<4>(posCero-1));
+			sucesores.push_back(ParEstadoAccion(a,eG));
 
-		if(posCero % 4 != 3){
-			a = new Accion15P(bitset<2>(2));
 			
-			estadoGenerado = operar(s,a);
-			sucesores.push_back(ParEstadoAccion(a,estadoGenerado));
 		}
+		//Derecha
+		if(posCero % 4 != 3){
+			estadoComp = estado -> matriz;
+			a = new Accion15P(bitset<2>(2));
+			valor = (estadoComp >> 64 - posCero*4 - 8) & bitset<64>(15);
+			estadoComp = (valor << 64 - posCero*4 -4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4- 8)));
+				
+			/*for(int j = 0 ; j < 4 ; j++){
+				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 - 4 - j];
+				estadoComp.reset(63 - (posCero*4) - 4 - j);
+			}*/
+			eG = new Estado15P(estadoComp, bitset<4>(posCero+1));
+			sucesores.push_back(ParEstadoAccion(a,eG));
+		}	
+			
+
+
+
+		
+		
 
 		return sucesores;
 	}
@@ -271,7 +313,6 @@ public:
 	//Funcion que determina la heuristica
 	int h(Estado* s){
 		Estado15P* e = static_cast<Estado15P*>(s);
-
 		bitset<40> patron1 = bitset<40>(0);
 		bitset<40> patron2 = bitset<40>(0);
 		bitset<40> patron3 = bitset<40>(0);
@@ -752,3 +793,5 @@ public:
 		};
 		
 	};
+
+#endif

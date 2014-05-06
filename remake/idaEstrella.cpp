@@ -43,7 +43,7 @@ public:
 
 		hh = modelo -> h(nod -> estado);
 
-		f = nod -> costo + hh;
+		f = nod -> getCosto() + hh;
 		
 		
 		if(f > l){
@@ -53,7 +53,7 @@ public:
 		}
 		if(modelo -> is_goal(nod -> estado)){
 			// cout << "Profundidad: " << nod -> costo << "\n";
-			cout << *generados << " " << nod -> costo << " ";
+			cout << *generados << " " << nod -> getCosto() << " ";
 			return -1;
 		}
 		int min = INT_MAX;
