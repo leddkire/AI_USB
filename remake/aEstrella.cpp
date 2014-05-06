@@ -29,7 +29,7 @@ public:
 		priority_queue<Nodo*, vector<Nodo*>, comparar> nodos;
 		int profundidadActual = 0;
 		vector<Nodo*> sucesores;
-		unordered_map<size_t, Estado*> cerrados;
+		unordered_map<size_t, bitset<1>> cerrados;
 		size_t hash;
 		int generados = 0;
 		//bitset<64> estadoGoal;
@@ -45,6 +45,8 @@ public:
 		//Manhattan modelito = Manhattan(goal);
 		Nodo* nodo_A_Evaluar;
 		nodos.push(inicial);
+		hash = modelo -> calcularHash(inicial -> estado);
+		cerrados.insert({hash,bitset<1>(0)});
 		
 		while(1){
 			if (nodos.empty()){
@@ -54,10 +56,10 @@ public:
 
 				nodo_A_Evaluar = nodos.top();
 				nodos.pop();
-				hash = modelo -> calcularHash(nodo_A_Evaluar -> estado);
-				cerrados.insert({hash,nodo_A_Evaluar -> estado});
+				
 				if(nodo_A_Evaluar ->profundidad > profundidadActual){
 					profundidadActual = nodo_A_Evaluar->profundidad;
+					cerr << profundidadActual << "\n";
 				}
 				if(modelo -> is_goal(nodo_A_Evaluar->estado)){
 					// cout << "Se encontro una solucion \n";
@@ -86,11 +88,14 @@ public:
 							
 							sucesores[i] -> f =sucesores[i] -> costo + modelo->h(sucesores[i] -> estado);
 							nodos.push(sucesores[i]);
+							cerrados.insert({hash,bitset<1>(0)});
 						}
 
 					}else{
 						for(int i = 0; i < sucesores.size(); i ++){
 							nodos.push(sucesores[i]);
+							hash = modelo -> calcularHash(nodo_A_Evaluar -> estado);
+							cerrados.insert({hash,bitset<1>(0)});
 						}
 					}
 					
