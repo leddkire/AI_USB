@@ -162,7 +162,7 @@ public:
 	bool operator() (Nodo* izq, Nodo* der) const
 	{
 
-		return izq -> f > der -> f;
+		return izq -> getF().to_ulong() > der -> getF().to_ulong();
 
 	}
 };

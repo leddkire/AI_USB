@@ -15,7 +15,7 @@
 #include <iostream>
 using namespace std;
 
-class Estado15P : public Estado
+class Estado15P
 {
 	
 public:
@@ -74,17 +74,17 @@ public:
 };
 
 
-class Manhattan : public Heuristica{
+class Manhattan {
 public:
 	unordered_map<size_t, int> costos;
 
 	Manhattan() {};
 
-	Manhattan(Estado* inicial) {
+	Manhattan(Estado15P inicial) {
 		generarHeuristicas(inicial);
 	};
 
-	void generarHeuristicas(Estado* modelo) {
+	void generarHeuristicas(Estado15P modelo) {
 		bitset<64> numero;
 		bitset<64> posicion;
 		bitset<64> preLlave;
@@ -113,8 +113,7 @@ public:
 		 
 	};
 
-	int generarEstimado(Estado* sucesor) {
-		Estado15P* suc = static_cast<Estado15P*>(sucesor);
+	int generarEstimado(Estado15P suc) {
 		bitset<64> mascara = bitset<64>(15);
 		bitset<64> temporal, prekey;
 		int j = 0;
@@ -123,7 +122,7 @@ public:
 		hash<bitset<64>> funhash;
 		//suc->imprimirEstado();
 		for(int i = 60; i >= 0; i = i-4) {
-			temporal = (suc -> matriz) >> i;
+			temporal = (suc.matriz >> i;
 			//cout << "Probando!" << temporal << "\n";
 			temporal &= mascara;
 			temporal = bitset<64>(temporal.to_ulong());
@@ -145,12 +144,12 @@ public:
 };
 
 
-class Modelo15P : public Modelo
+class Modelo15P
 {
 	
 public:
-	Estado15P* inicial;
-	Estado15P* goal;
+	Estado15P inicial;
+	Estado15P goal;
 	hash<bitset<64>> fHash; //Funcion de hash para el estado
 	hash<bitset<40>> fHashPDBA;
 	hash<bitset<68>> fHashPDB;
@@ -172,21 +171,21 @@ public:
 		
 		i++;
 		}while(i < 16);
-		Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
-		Manhattan* heuris = new Manhattan(goal);
+		Estado15P goal = Estado15P(estadoGoal, bitset<4>(0));
+		Manhattan heuris = Manhattan(goal);
 	}
 
-	Modelo15P(Estado* i, Estado* g){
-		inicial = static_cast<Estado15P*>(i);
-		goal = static_cast<Estado15P*>(g);
+	Modelo15P(Estado15P i, Estado15P g){
+		inicial = i;
+		goal = g;
 		heuris = Manhattan(goal);
 	}
 
-	Modelo15P(Estado* i, Estado* g, unordered_map<size_t,int> m1,
+	Modelo15P(Estado15P i, Estado15P g, unordered_map<size_t,int> m1,
 									unordered_map<size_t,int> m2,
 									unordered_map<size_t,int> m3){
-		inicial = static_cast<Estado15P*>(i);
-		goal = static_cast<Estado15P*>(g);
+		inicial = i;
+		goal = g;
 		map1 = m1;
 		map2 = m2;
 		map3 = m3;
@@ -196,42 +195,35 @@ public:
 
 	};
 
-	Estado* init(){
+	Estado15P init(){
 		Estado15P ini = Estado15P();
 		inicial = &ini;
 		return inicial;
 	};
 
-	int heuristicaEstado(Estado* s) {
-		Estado15P* est = static_cast<Estado15P*>(s);
-		return heuris.generarEstimado(est);
-	}
-
-	bool is_goal(Estado* s){
-		Estado15P* estado = static_cast<Estado15P*>(s);
-		if (estado -> matriz == goal -> matriz){
+	bool is_goal(bitset<64> estado){
+		if (estado == goal.matriz){
 			return true;
 		}
 		return false;
 	};
 
-	vector<ParEstadoAccion> succ(Estado* s){
+	vector<ParEstadoAccion> succ(bitset<64> matriz, bitset<4> ubicacion0){
 		int posCero;
-		Estado* eG;
-		Estado15P* estado = static_cast<Estado15P*>(s);
+		Estado15P eG;
 		vector<ParEstadoAccion> sucesores;
 		bitset<64> estadoComp;
 		bitset<64> valor;
- 		posCero = estado -> ubicacion0.to_ulong();
- 		estadoComp = estado -> matriz;
- 		Accion15P* a;
+ 		posCero = ubicacion0.to_ulong();
+ 		estadoComp = matriz;
+ 		Accion15P a;
 
 		//Revisa cada posible accion (Arriba, Abajo, Izquierda, Derecha)
 		//Y efectua el cambio de estado adecuado para luego crear el nodo.
 		//Hacia arriba
 		if(posCero >= 4){
-			estadoComp = estado -> matriz;
-			a = new Accion15P(bitset<2>(0));
+			estadoComp = matriz;
+			a = Accion15P(bitset<2>(0));
 			valor = (estadoComp >> 64 - posCero*4 + 12) & bitset<64>(15);
 			estadoComp = (valor << 64 - posCero*4 -4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4 +12)));
 
@@ -239,13 +231,13 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 16 - j];
 				estadoComp.reset(63 - (posCero*4) + 16 - j);
 			}*/
-			eG = new Estado15P(estadoComp, bitset<4>(posCero-4));
+			eG = Estado15P(estadoComp, bitset<4>(posCero-4));
 			sucesores.push_back(ParEstadoAccion(a,eG));
 		}
 		//Hacia abajo
 		if(posCero <= 11){
-			estadoComp = estado -> matriz;
-			a = new Accion15P(bitset<2>(3));
+			estadoComp = matriz;
+			a = Accion15P(bitset<2>(3));
 			valor = (estadoComp >> 64 - posCero*4 - 20) & bitset<64>(15);
 			estadoComp = (valor << 64 - posCero*4 - 4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4- 20)));
 
@@ -254,28 +246,28 @@ public:
 				estadoComp.reset(63 - (posCero*4) - 16 - j);
 			}*/
 			
-			eG = new Estado15P(estadoComp, bitset<4>(posCero+4));
+			eG = Estado15P(estadoComp, bitset<4>(posCero+4));
 			sucesores.push_back(ParEstadoAccion(a,eG));	
 		}
 		//Izquierda
 		if(posCero % 4 != 0){
-			estadoComp = estado -> matriz;
-			a =  new Accion15P(bitset<2>(1));
+			estadoComp = matriz;
+			a =  Accion15P(bitset<2>(1));
 			valor = (estadoComp >> 64 - posCero*4) & bitset<64>(15);
 			estadoComp = (valor << 64 - posCero*4 - 4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4)));
 			/*for(int j = 0 ; j < 4 ; j++){
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 4 - j];
 				estadoComp.reset(63 - (posCero*4) + 4 - j);
 			}*/
-			eG = new Estado15P(estadoComp, bitset<4>(posCero-1));
+			eG = Estado15P(estadoComp, bitset<4>(posCero-1));
 			sucesores.push_back(ParEstadoAccion(a,eG));
 
 			
 		}
 		//Derecha
 		if(posCero % 4 != 3){
-			estadoComp = estado -> matriz;
-			a = new Accion15P(bitset<2>(2));
+			estadoComp = matriz;
+			a = Accion15P(bitset<2>(2));
 			valor = (estadoComp >> 64 - posCero*4 - 8) & bitset<64>(15);
 			estadoComp = (valor << 64 - posCero*4 -4)|(estadoComp & ~(bitset<64>(15)<<(64 - posCero*4- 8)));
 				
@@ -283,7 +275,7 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 - 4 - j];
 				estadoComp.reset(63 - (posCero*4) - 4 - j);
 			}*/
-			eG = new Estado15P(estadoComp, bitset<4>(posCero+1));
+			eG = Estado15P(estadoComp, bitset<4>(posCero+1));
 			sucesores.push_back(ParEstadoAccion(a,eG));
 		}	
 			
@@ -307,15 +299,14 @@ public:
 
 
 	//Funcion que determina la heuristica
-	int h(Estado* s){
-		Estado15P* e = static_cast<Estado15P*>(s);
+	int h(bitset<64> matriz, bitset<4> ubicacion0){
 		bitset<40> patron1 = bitset<40>(0);
 		bitset<40> patron2 = bitset<40>(0);
 		bitset<40> patron3 = bitset<40>(0);
 
 		bitset<64> temp = bitset<64>(0);
 		temp.set();
-		temp &= e->matriz;
+		temp &= matriz;
 
 		//La heuristica esta basada en una pdb dividida en tres patrones
 		// de cinco valores.
@@ -366,8 +357,8 @@ public:
 		// para los valores.
 		return v1 + v2 + v3;
 		/*
-		Estado15P* e = static_cast<Estado15P*>(s);
-		bitset<64> estado = e -> matriz;
+		Estado15P e = static_cast<Estado15P>(s);
+		bitset<64> estado = e.matriz;
 		int distancia = 0;
 		int i2;
 		int j2;
@@ -394,14 +385,11 @@ public:
 	*/
 	}
 //INCOMPLETO
-	Estado* operar(Estado* s, Accion* a){
+	Estado15P operar(bitset<64> matriz, bitset<4> ubicacion0, bitset<2> accion){
 		Estado15P estadoGenerado;
-		Estado* eG;
-		Estado15P* estado = static_cast<Estado15P*>(s);
-		Accion15P* acc = static_cast<Accion15P*>(a);
-		bitset<2> accion = acc -> accion;
-		bitset<64> estadoComp = estado -> matriz;
-		int posCero = estado -> ubicacion0.to_ulong();
+		Estado15P eG;
+		bitset<64> estadoComp = matriz;
+		int posCero = ubicacion0.to_ulong();
 //Hay que optimizar estas operaciones
 		//Hacia arriba
 		if(accion == bitset<2>(0)){
@@ -409,7 +397,7 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 16 - j];
 				estadoComp.reset(63 - (posCero*4) + 16 - j);
 			}
-			eG = new Estado15P(estadoComp, bitset<4>(posCero-4));
+			eG = Estado15P(estadoComp, bitset<4>(posCero-4));
 
 		}
 		//Hacia abajo
@@ -418,7 +406,7 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 - 16 - j];
 				estadoComp.reset(63 - (posCero*4) - 16 - j);
 			}
-			eG = new Estado15P(estadoComp, bitset<4>(posCero+4));
+			eG = Estado15P(estadoComp, bitset<4>(posCero+4));
 
 		}
 		//Izquierda
@@ -427,7 +415,7 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 + 4 - j];
 				estadoComp.reset(63 - (posCero*4) + 4 - j);
 			}
-			eG = new Estado15P(estadoComp, bitset<4>(posCero-1));
+			eG = Estado15P(estadoComp, bitset<4>(posCero-1));
 
 		}
 		//Derecha
@@ -436,31 +424,25 @@ public:
 				estadoComp[63 - (posCero*4) - j] = estadoComp[63 - posCero*4 - 4 - j];
 				estadoComp.reset(63 - (posCero*4) - 4 - j);
 			}
-			eG = new Estado15P(estadoComp, bitset<4>(posCero+1));
+			eG = Estado15P(estadoComp, bitset<4>(posCero+1));
 		}
 		return eG;
 	}
 
-	bool esAccionInversa(Accion* anterior, Accion* aEvaluar){
-		Accion15P* anterior15 = static_cast<Accion15P*>(anterior);
-		Accion15P* aEvaluar15 = static_cast<Accion15P*>(aEvaluar);
-		bitset<2> b1 = anterior15 -> accion;
-		bitset<2> b2 = aEvaluar15 -> accion;
+	bool esAccionInversa(bitset<2> b1, bitset<2> b2){
 		if(~(b1) == b2){
 			return true;
 		}
 		return false;
 	}
 
-	virtual size_t calcularHash(Estado* s){
-		Estado15P* e = static_cast<Estado15P*>(s);
-		return fHash(e -> matriz);
+	virtual size_t calcularHash(bitset<64> matriz){
+		return fHash(matriz);
 
 	}
 
-	virtual size_t calcularHashPDB(Estado* s){
-		Estado15P* e = static_cast<Estado15P*>(s);
-		long int valor = e -> ubicacion0.to_ulong(), valorMatriz = ((e -> matriz).to_ulong());
+	virtual size_t calcularHashPDB(Estado15P e){
+		long int valor = e.ubicacion0.to_ulong(), valorMatriz = ((e.matriz).to_ulong());
 		bitset<68> forHash = bitset<68>(valorMatriz);
 		bitset<68> valor0 = bitset<68>(valor);
 		valor0 <<= 64;
@@ -468,15 +450,14 @@ public:
 		return fHashPDB(valor0);
 	}
 
-	size_t calcularHashPDBArchivo(Estado* s/*, int ignorar*/){
-		Estado15P* e = static_cast<Estado15P*>(s);
+	size_t calcularHashPDBArchivo(Estado15P e/*, int ignorar*/){
 
 		bitset<40> patron = bitset<40>(0);
 
 
 		bitset<64> temp = bitset<64>(0);
 		temp.set();
-		temp &= e->matriz;
+		temp &= e.matriz;
 
 		bitset<4> valor;
 		bitset<4> indice;
@@ -499,24 +480,22 @@ public:
 
 	}
 
-	int estaCerrado(Estado* s){
-		Estado15P* e = static_cast<Estado15P*>(s);
-		size_t hash = fHash(e -> matriz);
+	int estaCerrado(bitset<64> matriz){
+		size_t hash = fHash(matriz);
 		return mHashCerrados.count(hash);
 
 	}
 
-	void insertarCerrado(Estado* s){
-		Estado15P* e = static_cast<Estado15P*>(s);
-		size_t hash = fHash(e -> matriz);
-		pair<size_t,bitset<64>> parHashEstado (hash,e->matriz);
+	void insertarCerrado(bitset<64> matriz){
+		size_t hash = fHash(matriz);
+		pair<size_t,bitset<64>> parHashEstado (hash,matriz);
 		mHashCerrados.insert(parHashEstado);
 	}
 };
 
 class compararB{
 public:
-	bool operator() (pair<Estado*,bitset<6>> izq, pair<Estado*,bitset<6>> der) const
+	bool operator() (pair<Estado15P,bitset<6>> izq, pair<Estado15P,bitset<6>> der) const
 	{
 
 		return izq.second.to_ulong() > der.second.to_ulong();
@@ -527,14 +506,14 @@ public:
 
 
 
-class PDB : public Heuristica{
+class PDB {
 public:
 	unordered_map<size_t, int> costosp1;
 	unordered_map<size_t, int> costosp2;
 	unordered_map<size_t, int> costosp3;
 	PDB() {};
 
-	PDB(Estado* inicial) {
+	PDB(Estado15P inicial) {
 		generarHeuristicas(inicial);
 	};
 
@@ -549,15 +528,15 @@ public:
 
 
 
-	void generarPatron(ofstream& fd, Estado15P* patron, int ignorar){
+	void generarPatron(ofstream& fd, Estado15P patron, int ignorar){
 		bitset<64> patronson = bitset<64>(15);
 		unordered_map<size_t,bitset<1>> ya_escritos;
 		Modelo15P m = Modelo15P();
-		priority_queue<pair<Estado15P*,bitset<6>>, vector<pair<Estado15P*,bitset<6>>>, compararB> por_revisar;
+		priority_queue<pair<Estado15P,bitset<6>>, vector<pair<Estado15P,bitset<6>>>, compararB> por_revisar;
 		unordered_multimap<size_t,bitset<1>> cerrados;
 		bitset<64> temporal;
 		
-		pair<Estado15P*,bitset<6>> por_generar;
+		pair<Estado15P,bitset<6>> por_generar;
 		short costoI;
 		vector<ParEstadoAccion> sucesores;
 		size_t jhash;
@@ -566,7 +545,7 @@ public:
 		short posDelCero;
 		int elCero, i = 0;
 		bitset<6> costo = bitset<6>(0);
-		por_revisar.push(pair<Estado15P*,bitset<6>>(patron,costo));
+		por_revisar.push(pair<Estado15P,bitset<6>>(patron,costo));
 
 		cerrados.insert({m.calcularHashPDB(patron),bitset<1>(0)});
 /*
@@ -599,8 +578,8 @@ public:
 
 			for(int i=0;i < sucesores.size();i++){
 				
-				Estado15P* e15 = static_cast<Estado15P*>(sucesores[i].s);
-				Accion15P* a15 = static_cast<Accion15P*>(sucesores[i].a);
+				Estado15P e15 = static_cast<Estado15P>(sucesores[i].s);
+				Accion15P a15 = static_cast<Accion15P>(sucesores[i].a);
 				jhash= m.calcularHash(e15);
 
 
@@ -608,18 +587,18 @@ public:
 
 					if(jhash == invhash){
 						costo = por_generar.second;
-						por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+						por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 					}else{
 						costoI = por_generar.second.to_ulong();
 						costo = bitset<6>(costoI + 1);
-						por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+						por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 					}
 				/*	
-					elCero = e15 -> ubicacion0.to_ulong();
+					elCero = e15.ubicacion0.to_ulong();
 			
-					if((a15 -> accion) == bitset<2>(0)){
+					if((a15.accion) == bitset<2>(0)){
 						//printf("La accion fue: ");
-						//cout << a15 -> accion << "\n";
+						//cout << a15.accion << "\n";
 						posDelCero= (63- elCero*4 - 16) - 3;
 						//printf("POS DEL CERO %d \n", posDelCero);
 						temporal = (e15-> matriz) >> posDelCero;
@@ -629,17 +608,17 @@ public:
 						if( posDelCero == ignorar){
 							//printf("La posicion del cero ES blanco\n");
 							costo = por_generar.second;
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}else{
 							//printf("La posicion del cero no es blanco\n");
 
 							costoI = por_generar.second.to_ulong();
 							costo = bitset<6>(costoI + 1);
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}
 					}else if((a15-> accion) == bitset<2>(1)){
 						//printf("La accion fue: ");
-						//cout << a15 -> accion << "\n";
+						//cout << a15.accion << "\n";
 						posDelCero= (63- elCero*4 - 4) - 3;
 						//printf("POS DEL CERO %d \n", posDelCero);
 						temporal = (e15-> matriz) >> posDelCero;
@@ -649,16 +628,16 @@ public:
 						if( posDelCero == ignorar){
 							//printf("La posicion del cero ES blanco\n");
 							costo = por_generar.second;
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}else{
 							//printf("La posicion del cero no es blanco\n");
 							costoI = por_generar.second.to_ulong();
 							costo = bitset<6>(costoI + 1);
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}
 					}else if((a15-> accion) == bitset<2>(2)){
 						//printf("La accion fue: ");
-						//cout << a15 -> accion << "\n";
+						//cout << a15.accion << "\n";
 						posDelCero= (63- elCero*4 + 4) - 3;
 						//printf("POS DEL CERO %d \n", posDelCero);
 						temporal = (e15-> matriz) >> posDelCero;
@@ -668,16 +647,16 @@ public:
 						if( posDelCero == ignorar){
 							//printf("La posicion del cero ES blanco\n");
 							costo = por_generar.second;
-							por_revisar.push(pair<Estado15P*,bitset<6>>( e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>( e15, costo));
 						}else{
 							//printf("La posicion del cero no es blanco\n");
 							costoI = por_generar.second.to_ulong();
 							costo = bitset<6>(costoI + 1);
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}
 					}else if((a15-> accion) == bitset<2>(3)){
 						//printf("La accion fue: ");
-						//cout << a15 -> accion << "\n";
+						//cout << a15.accion << "\n";
 						posDelCero= (63- elCero*4 + 16) - 3;
 						//printf("POS DEL CERO %d \n", posDelCero);
 						temporal = (e15-> matriz) >> posDelCero;
@@ -687,12 +666,12 @@ public:
 						if( posDelCero == ignorar){
 							//printf("La posicion del cero ES blanco\n");
 							costo = por_generar.second;
-							por_revisar.push(pair<Estado15P*,bitset<6>>( e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>( e15, costo));
 						}else{
 							//printf("La posicion del cero no es blanco\n");
 							costoI = por_generar.second.to_ulong();
 							costo = bitset<6>(costoI + 1);
-							por_revisar.push(pair<Estado15P*,bitset<6>>(e15, costo));
+							por_revisar.push(pair<Estado15P,bitset<6>>(e15, costo));
 						}
 					}*/
 
@@ -710,20 +689,20 @@ public:
 		cerrados.clear();
 		sucesores.clear();
 		ya_escritos.clear();
-		priority_queue<pair<Estado15P*,bitset<6>>, vector<pair<Estado15P*,bitset<6>>>, compararB>().swap(por_revisar);
+		priority_queue<pair<Estado15P,bitset<6>>, vector<pair<Estado15P,bitset<6>>>, compararB>().swap(por_revisar);
 		vector<ParEstadoAccion>().swap(sucesores);
 	}
 
-	void designarValorBlanco(Estado15P* e, bitset<4> ignorar){
+	void designarValorBlanco(Estado15P e, bitset<4> ignorar){
 		bitset<4> valor;
 		//Se ignora el cero verdadero, por eso recorre solo 15 posiciones y no 16
 		for(int i = 0; i <15; i++){
 
-			valor = extraerValor(e -> matriz, i*4);
+			valor = extraerValor(e.matriz, i*4);
 
 			if(valor.to_ulong() == 0){
 				for(int j = 0; j<4; j++){
-					e->matriz[i*4+j] = ignorar[j];
+					e.matriz[i*4+j] = ignorar[j];
 				}
 			}
 		}
@@ -731,22 +710,21 @@ public:
 
 	}
 
-	void generarHeuristicas(Estado* inicial) {
-		Estado15P* ini = static_cast<Estado15P*>(inicial);
-		Estado15P* patron1 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
-		Estado15P* patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
-		Estado15P* patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+	void generarHeuristicas(Estado15P ini) {
+		Estado15P patron1 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
 
 		bitset<4> ignorar1;
 		bitset<4> ignorar2;
 		bitset<4> ignorar3;
 
-		patron1 -> matriz <<= 40;
-		patron2 -> matriz <<= 20;
+		patron1.matriz <<= 40;
+		patron2.matriz <<= 20;
 
-		patron1 -> matriz &= ini -> matriz;
-		patron2 -> matriz &= ini -> matriz;
-		patron3 -> matriz &= ini -> matriz;
+		patron1.matriz &= ini.getEstado;
+		patron2.matriz &= ini.matriz;
+		patron3.matriz &= ini.matriz;
 /*
 		ignorar1 = bitset <4>(15);
 		designarValorBlanco(patron1, ignorar1);
@@ -755,11 +733,11 @@ public:
 		ignorar3 = bitset<4>(1);
 		designarValorBlanco(patron3, ignorar3);
 */
-		patron1 -> imprimirEstado();
+		patron1.imprimirEstado();
 		cout << "\n";
-		patron2 -> imprimirEstado();
+		patron2.imprimirEstado();
 		cout << "\n";
-		patron3 -> imprimirEstado();
+		patron3.imprimirEstado();
 
 		ofstream  archivop1;
 		ofstream archivop2;
