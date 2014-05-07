@@ -26,7 +26,7 @@ public:
 
 	int buscar(Nodo* inicial){
 		
-		priority_queue<Nodo*, vector<Nodo*>, comparar15P> nodos;
+		priority_queue<Nodo*, vector<Nodo*>, comparar> nodos;
 		int profundidadActual = 0;
 		int profundidad = 0;
 		vector<Nodo*> sucesores;
@@ -58,7 +58,7 @@ public:
 
 				nodo_A_Evaluar = nodos.top();
 				nodos.pop();
-				profundidad = nodo_A_Evaluar ->getProfundidad();
+				profundidad = nodo_A_Evaluar ->profundidad;
 				if( profundidad > profundidadActual){
 					profundidadActual = profundidad;
 					cerr << profundidadActual << "\n";
@@ -93,14 +93,14 @@ public:
 							}
 							//Calculando la heuristica.
 							
-							sucesores[i]-> asignarF(modelo);
+							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo -> h(sucesores[i] -> estado) ;
 							nodos.push(sucesores[i]);
 							cerrados.insert({hash,bit0});
 						}
 
 					}else{
 						for(int i = 0; i < sucesores.size(); i ++){
-							sucesores[i]-> asignarF(modelo);
+							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo -> h(sucesores[i] -> estado) ;
 							nodos.push(sucesores[i]);
 							hash = modelo -> calcularHash(nodo_A_Evaluar -> estado);
 							cerrados.insert({hash,bit0});

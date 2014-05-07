@@ -3,9 +3,6 @@
 #define MODELO15
 
 
-#include "Modelo.h"
-
-
 #include <bitset>
 #include <vector>
 #include <cstddef>
@@ -25,7 +22,6 @@ public:
 	bitset<64> matriz;
 	bitset<4> ubicacion0;
 
-	~Estado15P(){}
 	Estado15P(){
 		matriz.reset();
 		ubicacion0.reset();
@@ -35,7 +31,7 @@ public:
 		ubicacion0 = ubicacion;
 	}
 
-	int costo(Accion* a){
+	int costo(Accion a){
 		return 1;
 	}
 
