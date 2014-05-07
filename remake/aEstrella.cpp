@@ -15,12 +15,11 @@ using namespace std;
 
 class aEstrella : public AlgoritmoBusqueda{
 public:
-
 	aEstrella(){
 		modelo = NULL;
 	}
 
-	aEstrella(Modelo* m){
+	aEstrella(Modelo15P m){
 		modelo = m;
 	}
 
@@ -30,10 +29,10 @@ public:
 		int profundidadActual = 0;
 		int profundidad = 0;
 		vector<Nodo*> sucesores;
-		unordered_map<size_t, bitset<1>> cerrados;
+		unordered_map<size_t, bool> cerrados;
 		size_t hash;
 		int generados = 0;
-		bitset<1> bit0 = bitset<1>(0);
+		bool bit0 = false;
 		//bitset<64> estadoGoal;
 		//int i = 1;
 		//do{
@@ -47,7 +46,7 @@ public:
 		//Manhattan modelito = Manhattan(goal);
 		Nodo* nodo_A_Evaluar;
 		nodos.push(inicial);
-		hash = modelo -> calcularHash(inicial -> estado);
+		hash = modelo.calcularHash(inicial -> getEstado());
 		cerrados.insert({hash,bit0});
 		
 		while(1){
@@ -63,7 +62,7 @@ public:
 					profundidadActual = profundidad;
 					cerr << profundidadActual << "\n";
 				}
-				if(modelo -> is_goal(nodo_A_Evaluar->estado)){
+				if(modelo.is_goal(nodo_A_Evaluar->estado)){
 					// cout << "Se encontro una solucion \n";
 					// cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
 					cout << generados << " " << nodo_A_Evaluar->getCosto()<< " ";
@@ -81,39 +80,31 @@ public:
 					//Para que no ocurra una referencia a una accion nula con el nodo inicial
 					if(profundidadActual !=0){
 						for(int i = 0; i < sucesores.size(); i ++){
-							hash = modelo -> calcularHash(sucesores[i] -> estado);
+							hash = modelo.calcularHash(sucesores[i] -> getEstado());
 							if(cerrados.count(hash) == 1 & sucesores[i]->getCosto() != 0){
-								delete sucesores[i] -> estado;
-								delete sucesores[i] -> accion;
 								sucesores[i] -> padre = NULL;
-								sucesores[i] -> estado=NULL;
-								sucesores[i] -> accion = NULL;
 								delete sucesores[i];
 								continue;
 							}
 							//Calculando la heuristica.
 							
-							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo -> h(sucesores[i] -> estado) ;
+							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()) ;
 							nodos.push(sucesores[i]);
 							cerrados.insert({hash,bit0});
 						}
 
 					}else{
 						for(int i = 0; i < sucesores.size(); i ++){
-							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo -> h(sucesores[i] -> estado) ;
+							sucesores[i]-> setF(bitset<8>(sucesores[i] -> getCosto() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()))) ;
 							nodos.push(sucesores[i]);
-							hash = modelo -> calcularHash(nodo_A_Evaluar -> estado);
+							hash = modelo.calcularHash(nodo_A_Evaluar -> getEstado());
 							cerrados.insert({hash,bit0});
 						}
 					}
 					
 				}
-				if(nodo_A_Evaluar ->  accion != NULL){
-					delete nodo_A_Evaluar -> estado;
-					delete nodo_A_Evaluar -> accion;
+				if(nodo_A_Evaluar ->  getProf() != 0){
 					nodo_A_Evaluar -> padre = NULL;
-					nodo_A_Evaluar -> estado=NULL;
-					nodo_A_Evaluar -> accion = NULL;
 					delete nodo_A_Evaluar;
 				}
 				

@@ -9,16 +9,17 @@ using namespace std;
 
 class idaEstrella:public AlgoritmoBusqueda{
 public:
+
 	idaEstrella(){
 		modelo = NULL;
 	}
 
-	idaEstrella(Modelo* m){
+	idaEstrella(Modelo15 m){
 		modelo = m;
 	}
 
 	int buscar(Nodo* inicial){
-		int limite = modelo -> h(inicial -> estado);
+		int limite = modelo -> h(inicial -> getEstado(), inicial -> getUbicacion0());
 		int t;
 		int generados = 0;
 		while(1){
@@ -41,7 +42,7 @@ public:
 		int f;
 		int hh;
 
-		hh = modelo -> h(nod -> estado);
+		hh = modelo -> h(nod -> getEstado(), nod -> getUbicacion0());
 
 		f = nod -> getCosto() + hh;
 		
@@ -51,7 +52,7 @@ public:
 			nod = NULL;
 			return f;
 		}
-		if(modelo -> is_goal(nod -> estado)){
+		if(modelo.is_goal(nod -> getEstado())){
 			// cout << "Profundidad: " << nod -> costo << "\n";
 			cout << *generados << " " << nod -> getCosto() << " ";
 			return -1;
@@ -60,8 +61,8 @@ public:
 		sucesores = succ(nod);
 		*generados = *generados + sucesores.size();
 		for(int i = 0; i < sucesores.size();i++){
-			if(nod -> accion != NULL){
-				if(!(modelo -> esAccionInversa(nod -> accion, sucesores[i] -> accion))){
+			if(nod -> getProf() != 0){
+				if(!(modelo.esAccionInversa(nod -> getAccion(), sucesores[i] -> getAccion()))){
 					resultado = busquedaProfundidad(sucesores[i], l, generados);
 					if(resultado == -1){
 						return -1;
@@ -85,7 +86,7 @@ public:
 			
 		}
 
-		if(nod -> accion != NULL){
+		if(nod -> getProf() != 0){
 			delete nod;
 			nod = NULL;
 		}

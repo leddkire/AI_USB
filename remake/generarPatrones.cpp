@@ -15,7 +15,7 @@ int main(){
 	}while(i < 16);
 
 
-	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+	Estado15P goal = Estado15P(estadoGoal, bitset<4>(0));
 
 
 	cout<< "Generando tablas... \n";

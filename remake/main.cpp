@@ -95,7 +95,7 @@ int main(){
 	}while(i < 16);
 
 
-	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+	Estado15P goal = Estado15P(estadoGoal, bitset<4>(0));
 
 
 	cout<< "Generando tablas... \n";
@@ -205,8 +205,8 @@ while(getline(file,line)){
 	//Creacion del nodo inicial
 	//cout << "\nEstado Inicial: \n\n";
 	//imprimirEstado(estadoComp);
-	Estado15P* E_inicial = new Estado15P(estadoComp, ubicacion0);
-	init = new Estado15P(estadoComp, ubicacion0);
+	Estado15P E_inicial = Estado15P(estadoComp, ubicacion0);
+	init = Estado15P(estadoComp, ubicacion0);
 	Nodo* inicial = new Nodo(E_inicial);
 	
 	
@@ -215,7 +215,7 @@ while(getline(file,line)){
 	//imprimirEstado(estadoGoal);
 	
 	
-	Estado15P* goal = new Estado15P(estadoGoal, bitset<4>(0));
+	Estado15P goal = Estado15P(estadoGoal, bitset<4>(0));
 
 
 
@@ -224,7 +224,7 @@ while(getline(file,line)){
 	Modelo15P modelo = Modelo15P(E_inicial, goal, tabla1, tabla2, tabla3);
 
 
-	int dMan = modelo.h(inicial -> estado);
+	int dMan = modelo.h(inicial -> getEstado(), inicial -> getUbicacion0());
 	//cout << "Distancia Manhattan: "<< dMan << "\n";
 	//cout << distanciaMan(estadoComp);
 	//Creacion del algoritmo
@@ -233,7 +233,7 @@ while(getline(file,line)){
 
 	
 
-	aEstrella alg = aEstrella(&modelo);
+	aEstrella alg = aEstrella(modelo);
 	int resultado;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
 	resultado = alg.buscar(inicial);
