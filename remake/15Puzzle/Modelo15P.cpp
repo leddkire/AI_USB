@@ -284,7 +284,7 @@ public:
 	//Funcion que determina la heuristica
 	int h(bitset<64> matriz, bitset<4> ubicacion0){
 		
-/*
+
 		bitset<40> patron1 = bitset<40>(0);
 		bitset<40> patron2 = bitset<40>(0);
 		bitset<40> patron3 = bitset<40>(0);
@@ -342,7 +342,7 @@ public:
 		// para los valores.
 		return v1 + v2 + v3;
 
-		*/
+	/*
 
 		int distancia = 0;
 		int i2;
@@ -367,7 +367,7 @@ public:
 
 
 	return distancia;
-	
+	*/
 	}
 //INCOMPLETO
 	Estado15P operar(bitset<64> matriz, bitset<4> ubicacion0, bitset<2> accion){

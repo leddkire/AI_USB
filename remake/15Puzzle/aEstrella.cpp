@@ -65,7 +65,7 @@ public:
 				if(modelo.is_goal(nodo_A_Evaluar-> getEstado())){
 					// cout << "Se encontro una solucion \n";
 					// cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
-					cout << generados << " " << nodo_A_Evaluar->getCosto()<< " ";
+					cout << generados << "," << nodo_A_Evaluar->getCosto().to_ulong()<< ",";
 					delete nodo_A_Evaluar;
 					while(!nodos.empty()){
 						nodo_A_Evaluar = nodos.top();
@@ -73,7 +73,7 @@ public:
 						delete nodo_A_Evaluar;
 					}
 					cerrados.clear();
-					return 1;
+					return generados;
 				}else{
 					sucesores = succ(nodo_A_Evaluar);
 					generados = generados + sucesores.size();

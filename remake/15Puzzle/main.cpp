@@ -147,28 +147,27 @@ int main(){
 	std::chrono::duration<double> tTotal;
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
-	file.open("15testsE.txt");
+	file.open("15tests.txt");
 	//No olvidar chequeo de errores
 
 
 int probNum = 1;	
 
 	coutbuf = cout.rdbuf();
-	output.open("resultados.txt");
+	output.open("resultadosIdaPDB.txt");
 	cout.rdbuf(output.rdbuf()); //Se cambia salida standard al archivo de salida
-	cout << "<id> : <problema> : <limites> <# nodos generados> <profundidad optima> <tiempo> \n";
-	id_puzzle = 000;
+	cout << "<id> : <problema> : <# nodos generados> <profundidad optima> <tiempo> <Nodos/seg>\n";
 
 	
 
 
 while(getline(file,line)){
-	cout <<"Problema: " << probNum << "\n";
+	cout << probNum << ",";
 	probNum++;
 	//Se construye un sstream a partir de la linea
 	//Para poder convertir la linea en un arreglo de enteros
 	stringstream str(line);
-	cout << ++id_puzzle <<  " : " << line << " : ";
+	cout << line << ",";
 	//cout << "Estado inicial: \n" <<  line << "\n";
 	//Se leen los valores de 'str' y se insertan en el vector
 
@@ -232,16 +231,17 @@ while(getline(file,line)){
 	
 
 	idaEstrella alg = idaEstrella(modelo);
-	int resultado;
+	int nodosGen;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-	resultado = alg.buscar(inicial);
+	nodosGen = alg.buscar(inicial);
 
 	chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
 
   	std::chrono::duration<double> tiempo_corrida = chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
   	tTotal = tTotal + tiempo_corrida;
   	// cout << "Tardo " << tiempo_corrida.count() << " segundos.";
-  	cout << tiempo_corrida.count();
+  	cout << tiempo_corrida.count() << ",";
+  	cout << nodosGen/tiempo_corrida.count();
   	cout << std::endl;
 
 
