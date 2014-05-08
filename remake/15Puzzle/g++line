@@ -1,0 +1,1 @@
+g++ -g Modelo.cpp Modelo15P.cpp Nodo.cpp AlgoritmoBusqueda.cpp aEstrella.cpp idaEstrella.cpp main.cpp -o test
