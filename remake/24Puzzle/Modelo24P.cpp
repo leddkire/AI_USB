@@ -41,6 +41,7 @@ class Estado24P
 public:
 	bitset<125> matriz;
 	bitset<5> ubicacion0;
+	size_t valorHash;
 
 	Estado24P(){
 		matriz.reset();
@@ -71,7 +72,18 @@ public:
 
 		}
 	}
+
 };
+
+struct Hash_Estado_t {
+    size_t operator()(const size_t p) const {
+    	return p;
+    }
+    bool operator()(const size_t p, const size_t q) const {
+    	return p == q;
+    }
+};
+
 
 class ParEstadoAccion{
 	
@@ -475,7 +487,8 @@ public:
 		unordered_map<size_t,bitset<1>> ya_escritos;
 		Modelo24P m = Modelo24P();
 		priority_queue<pair<Estado24P,int>, vector<pair<Estado24P,int>>, compararB> por_revisar;
-		unordered_multimap<size_t,bitset<1>> cerrados;
+		//unordered_set<size_t, Hash_Estado_t, Hash_Estado_t> cerrados;
+		unordered_map<size_t,bitset<1>> cerrados;
 		bitset<125> temporal;
 		Estado24P e15;
 		Accion24P a15;
@@ -547,6 +560,7 @@ public:
 		Estado24P patron2 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
 		Estado24P patron3 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
 		Estado24P patron4 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
+		Estado24P patron5 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
 
 		patron1.matriz <<= 90;
 		patron2.matriz <<= 60;
