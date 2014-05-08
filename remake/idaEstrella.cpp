@@ -11,15 +11,15 @@ class idaEstrella:public AlgoritmoBusqueda{
 public:
 
 	idaEstrella(){
-		modelo = NULL;
+		modelo = Modelo15P();
 	}
 
-	idaEstrella(Modelo15 m){
+	idaEstrella(Modelo15P m){
 		modelo = m;
 	}
 
 	int buscar(Nodo* inicial){
-		int limite = modelo -> h(inicial -> getEstado(), inicial -> getUbicacion0());
+		int limite = modelo.h(inicial -> getEstado(), inicial -> getUbicacion0());
 		int t;
 		int generados = 0;
 		while(1){
@@ -42,9 +42,9 @@ public:
 		int f;
 		int hh;
 
-		hh = modelo -> h(nod -> getEstado(), nod -> getUbicacion0());
+		hh = modelo.h(nod -> getEstado(), nod -> getUbicacion0());
 
-		f = nod -> getCosto() + hh;
+		f = nod -> getCosto().to_ulong() + hh;
 		
 		
 		if(f > l){

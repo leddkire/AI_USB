@@ -72,7 +72,7 @@ int main(){
 	bitset<64> estadoComp;
 	bitset<64> estadoGoal;
 	bitset<4> ubicacion0; //Indice donde se encuentra en cuadro blanco
-	Estado15P* init;
+	Estado15P init;
 
 	//Maps para los tres patrones
 	unordered_map<size_t,int> tabla1;
@@ -223,8 +223,6 @@ while(getline(file,line)){
 	//Creacion del modelo
 	Modelo15P modelo = Modelo15P(E_inicial, goal, tabla1, tabla2, tabla3);
 
-
-	int dMan = modelo.h(inicial -> getEstado(), inicial -> getUbicacion0());
 	//cout << "Distancia Manhattan: "<< dMan << "\n";
 	//cout << distanciaMan(estadoComp);
 	//Creacion del algoritmo
@@ -233,7 +231,7 @@ while(getline(file,line)){
 
 	
 
-	aEstrella alg = aEstrella(modelo);
+	idaEstrella alg = idaEstrella(modelo);
 	int resultado;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
 	resultado = alg.buscar(inicial);

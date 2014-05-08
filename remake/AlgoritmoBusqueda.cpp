@@ -8,7 +8,7 @@ using namespace std;
 
 class AlgoritmoBusqueda{
 public:
-	Modelo15P modelo
+	Modelo15P modelo;
 	
 	vector<Nodo*> succ(Nodo* n){
 		vector<ParEstadoAccion> estadosAccion;

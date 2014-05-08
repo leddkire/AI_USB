@@ -15,6 +15,27 @@
 #include <iostream>
 using namespace std;
 
+class Accion15P
+{
+	
+public:
+	bitset<2> accion;
+
+	Accion15P(){
+		accion.reset();
+	}
+
+	Accion15P(bitset<2> a){
+		accion = a;
+	}
+
+	void imprimirAccion(){
+
+		cout << accion.to_ulong();
+	}
+};
+
+
 class Estado15P
 {
 	
@@ -31,7 +52,7 @@ public:
 		ubicacion0 = ubicacion;
 	}
 
-	int costo(Accion a){
+	int costo(Accion15P a){
 		return 1;
 	}
 
@@ -53,24 +74,18 @@ public:
 	}
 };
 
-class Accion15P : public Accion
-{
+class ParEstadoAccion{
 	
 public:
-	bitset<2> accion;
+	Accion15P a;
+	Estado15P s;
 
-	Accion15P(){
-		accion.reset();
+	ParEstadoAccion(Accion15P ac, Estado15P st){
+		a = ac;
+		s = st;
+
 	}
 
-	Accion15P(bitset<2> a){
-		accion = a;
-	}
-
-	void imprimirAccion(){
-
-		cout << accion.to_ulong();
-	}
 };
 
 
@@ -122,7 +137,7 @@ public:
 		hash<bitset<64>> funhash;
 		//suc->imprimirEstado();
 		for(int i = 60; i >= 0; i = i-4) {
-			temporal = (suc.matriz >> i;
+			temporal = suc.matriz >> i;
 			//cout << "Probando!" << temporal << "\n";
 			temporal &= mascara;
 			temporal = bitset<64>(temporal.to_ulong());
@@ -162,8 +177,8 @@ public:
 	Modelo15P(){
 		bitset<64> estadoGoal;
 
-		inicial = NULL;
-		goal = NULL;
+		inicial = Estado15P();
+		goal = Estado15P();
 		int i = 1;
 		do{
 			estadoGoal = estadoGoal << 4;
@@ -178,7 +193,6 @@ public:
 	Modelo15P(Estado15P i, Estado15P g){
 		inicial = i;
 		goal = g;
-		heuris = Manhattan(goal);
 	}
 
 	Modelo15P(Estado15P i, Estado15P g, unordered_map<size_t,int> m1,
@@ -193,12 +207,6 @@ public:
 
 	Estado15P leer(int fd){
 
-	};
-
-	Estado15P init(){
-		Estado15P ini = Estado15P();
-		inicial = &ini;
-		return inicial;
 	};
 
 	bool is_goal(bitset<64> estado){
@@ -300,6 +308,8 @@ public:
 
 	//Funcion que determina la heuristica
 	int h(bitset<64> matriz, bitset<4> ubicacion0){
+		
+/*
 		bitset<40> patron1 = bitset<40>(0);
 		bitset<40> patron2 = bitset<40>(0);
 		bitset<40> patron3 = bitset<40>(0);
@@ -356,9 +366,9 @@ public:
 		//Aqui se calcula el hash de los tres y se busca en las tablas
 		// para los valores.
 		return v1 + v2 + v3;
-		/*
-		Estado15P e = static_cast<Estado15P>(s);
-		bitset<64> estado = e.matriz;
+
+		*/
+
 		int distancia = 0;
 		int i2;
 		int j2;
@@ -366,7 +376,7 @@ public:
 			for(int j=0; j < 4; j++){
 				bitset<4> valor; 
 				for(int k=0; k< 4; k++){
-					valor[3 - k] = estado[63 - i*16 - j*4 - k];
+					valor[3 - k] = matriz[63 - i*16 - j*4 - k];
 				}
 				if(valor == 0){
 					continue;
@@ -382,7 +392,7 @@ public:
 
 
 	return distancia;
-	*/
+	
 	}
 //INCOMPLETO
 	Estado15P operar(bitset<64> matriz, bitset<4> ubicacion0, bitset<2> accion){
@@ -535,6 +545,8 @@ public:
 		priority_queue<pair<Estado15P,bitset<6>>, vector<pair<Estado15P,bitset<6>>>, compararB> por_revisar;
 		unordered_multimap<size_t,bitset<1>> cerrados;
 		bitset<64> temporal;
+		Estado15P e15;
+		Accion15P a15;
 		
 		pair<Estado15P,bitset<6>> por_generar;
 		short costoI;
@@ -568,19 +580,19 @@ public:
 				ya_escritos.insert({jhash,bitset<1>(0)});
 				fd << jhash << " " << por_generar.second.to_ulong() << "\n";
 			}
-			invhash = m.calcularHash(por_generar.first);
+			invhash = m.calcularHash(por_generar.first.matriz);
 			
 			//cerrados.insert({m.calcularHash(por_generar.first),bitset<1>(0)});
-			sucesores = m.succ(por_generar.first);
+			sucesores = m.succ(por_generar.first.matriz, por_generar.first.ubicacion0);
 
-			delete por_generar.first;	
+			//delete por_generar.first;	
 			por_revisar.pop();
 
 			for(int i=0;i < sucesores.size();i++){
 				
-				Estado15P e15 = static_cast<Estado15P>(sucesores[i].s);
-				Accion15P a15 = static_cast<Accion15P>(sucesores[i].a);
-				jhash= m.calcularHash(e15);
+				Estado15P e15 = sucesores[i].s;
+				Accion15P a15 = sucesores[i].a;
+				jhash= m.calcularHash(e15.matriz);
 
 
 				if(cerrados.count(m.calcularHashPDB(e15)) == 0){
@@ -677,10 +689,10 @@ public:
 
 						cerrados.insert({m.calcularHashPDB(e15),bitset<1>(0)});
 				}else{	
-					delete e15;
+					//delete e15;
 
 				}
-				delete a15;
+				//delete a15;
 
 			}
 			sucesores.clear();
@@ -711,9 +723,9 @@ public:
 	}
 
 	void generarHeuristicas(Estado15P ini) {
-		Estado15P patron1 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
-		Estado15P patron2 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
-		Estado15P patron3 = new Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P patron1 = Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P patron2 = Estado15P(bitset<64>(1048575),bitset<4>(0));
+		Estado15P patron3 = Estado15P(bitset<64>(1048575),bitset<4>(0));
 
 		bitset<4> ignorar1;
 		bitset<4> ignorar2;
@@ -722,7 +734,7 @@ public:
 		patron1.matriz <<= 40;
 		patron2.matriz <<= 20;
 
-		patron1.matriz &= ini.getEstado;
+		patron1.matriz &= ini.matriz;
 		patron2.matriz &= ini.matriz;
 		patron3.matriz &= ini.matriz;
 /*

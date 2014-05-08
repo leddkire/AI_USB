@@ -16,7 +16,7 @@ using namespace std;
 class aEstrella : public AlgoritmoBusqueda{
 public:
 	aEstrella(){
-		modelo = NULL;
+		modelo = Modelo15P();
 	}
 
 	aEstrella(Modelo15P m){
@@ -57,12 +57,12 @@ public:
 
 				nodo_A_Evaluar = nodos.top();
 				nodos.pop();
-				profundidad = nodo_A_Evaluar ->profundidad;
+				profundidad = nodo_A_Evaluar -> getProf().to_ulong();
 				if( profundidad > profundidadActual){
 					profundidadActual = profundidad;
 					cerr << profundidadActual << "\n";
 				}
-				if(modelo.is_goal(nodo_A_Evaluar->estado)){
+				if(modelo.is_goal(nodo_A_Evaluar-> getEstado())){
 					// cout << "Se encontro una solucion \n";
 					// cout << "Paso por " << nodo_A_Evaluar->costo<< " movimientos \n" ;
 					cout << generados << " " << nodo_A_Evaluar->getCosto()<< " ";
@@ -88,14 +88,14 @@ public:
 							}
 							//Calculando la heuristica.
 							
-							sucesores[i]-> f = sucesores[i] -> getCosto() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()) ;
+							sucesores[i]-> setF(bitset<8>(sucesores[i] -> getCosto().to_ulong() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()))) ;
 							nodos.push(sucesores[i]);
 							cerrados.insert({hash,bit0});
 						}
 
 					}else{
 						for(int i = 0; i < sucesores.size(); i ++){
-							sucesores[i]-> setF(bitset<8>(sucesores[i] -> getCosto() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()))) ;
+							sucesores[i]-> setF(bitset<8>(sucesores[i] -> getCosto().to_ulong() + modelo.h(sucesores[i] -> getEstado(), sucesores[i] -> getUbicacion0()))) ;
 							nodos.push(sucesores[i]);
 							hash = modelo.calcularHash(nodo_A_Evaluar -> getEstado());
 							cerrados.insert({hash,bit0});
