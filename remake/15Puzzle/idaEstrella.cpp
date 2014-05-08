@@ -25,11 +25,10 @@ public:
 		while(1){
 			t = busquedaProfundidad(inicial,limite,&generados);
 			if(t==-1){
-				return -1; //Se encontro una solucion
+				return generados; //Se encontro una solucion
 			}else if(t == INT_MAX){
-				return -2; //No se encontro una solucion
+				return generados; //No se encontro una solucion
 			}
-			cout << "Limite: "<< t << "\n";
 			limite = t;
 		}
 		return 0;
@@ -54,7 +53,7 @@ public:
 		}
 		if(modelo.is_goal(nod -> getEstado())){
 			// cout << "Profundidad: " << nod -> costo << "\n";
-			cout << *generados << " " << nod -> getCosto() << " ";
+			cout << *generados << "," << nod -> getCosto().to_ulong() << ",";
 			return -1;
 		}
 		int min = INT_MAX;
