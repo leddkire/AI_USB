@@ -60,7 +60,6 @@ public:
 				profundidad = nodo_A_Evaluar -> getProf().to_ulong();
 				if( profundidad > profundidadActual){
 					profundidadActual = profundidad;
-					cerr << profundidadActual << "\n";
 				}
 				if(modelo.is_goal(nodo_A_Evaluar-> getEstado())){
 					// cout << "Se encontro una solucion \n";

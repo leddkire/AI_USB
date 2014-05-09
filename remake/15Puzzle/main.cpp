@@ -154,7 +154,7 @@ int main(){
 int probNum = 1;	
 
 	coutbuf = cout.rdbuf();
-	output.open("resultadosIdaPDB.txt");
+	output.open("resultadosa2PDB.txt");
 	cout.rdbuf(output.rdbuf()); //Se cambia salida standard al archivo de salida
 	cout << "<id> : <problema> : <# nodos generados> <profundidad optima> <tiempo> <Nodos/seg>\n";
 
@@ -230,7 +230,7 @@ while(getline(file,line)){
 
 	
 
-	idaEstrella alg = idaEstrella(modelo);
+	aEstrella alg = aEstrella(modelo);
 	int nodosGen;
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
 	nodosGen = alg.buscar(inicial);

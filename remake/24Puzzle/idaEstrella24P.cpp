@@ -19,6 +19,7 @@ public:
 	}
 
 	int buscar(Nodo* inicial){
+		//cout << inicial -> getEstado() << endl;
 		int limite = modelo.h(inicial -> getEstado(), inicial -> getUbicacion0());
 		int t;
 		int generados = 0;
@@ -29,7 +30,6 @@ public:
 			}else if(t == INT_MAX){
 				return -2; //No se encontro una solucion
 			}
-			cout << "Limite: "<< t << "\n";
 			limite = t;
 		}
 		return 0;
@@ -54,7 +54,7 @@ public:
 		}
 		if(modelo.is_goal(nod -> getEstado())){
 			// cout << "Profundidad: " << nod -> costo << "\n";
-			cout << *generados << " " << nod -> getCosto() << " ";
+			cout << *generados << " " << nod -> getCosto().to_ulong() << " ";
 			return -1;
 		}
 		int min = INT_MAX;

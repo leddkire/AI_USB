@@ -110,13 +110,15 @@ public:
 	Estado24P inicial;
 	Estado24P goal;
 	hash<bitset<125>> fHash; //Funcion de hash para el estado
-	hash<bitset<60>> fHashPDBA;
+	hash<bitset<40>> fHashPDBA;
 	hash<bitset<130>> fHashPDB;
 	unordered_map<size_t,bitset<125>> mHashCerrados; //Mapa donde se colocaran los estados cerrados
 	unordered_map<size_t,int> map1;
 	unordered_map<size_t,int> map2;
 	unordered_map<size_t,int> map3;
 	unordered_map<size_t,int> map4;
+	unordered_map<size_t,int> map5;
+	unordered_map<size_t,int> map6;
 
 	Modelo24P(){
 		bitset<125> estadoGoal;
@@ -141,13 +143,17 @@ public:
 	Modelo24P(Estado24P i, Estado24P g, unordered_map<size_t,int> m1,
 									unordered_map<size_t,int> m2,
 									unordered_map<size_t,int> m3,
-									unordered_map<size_t,int> m4){
+									unordered_map<size_t,int> m4,
+									unordered_map<size_t,int> m5,
+									unordered_map<size_t,int> m6){
 		inicial = i;
 		goal = g;
 		map1 = m1;
 		map2 = m2;
 		map3 = m3;
 		map4 = m4;
+		map5 = m5;
+		map6 = m6;
 	}
 
 	Estado24P leer(int fd){
@@ -179,7 +185,6 @@ public:
 			a = Accion24P(bitset<2>(0));
 			valor = (estadoComp >> 125 - posCero*5 + 20) & bitset<125>(31);
 			estadoComp = (valor << 125 - posCero*5 -5)|(estadoComp & ~(bitset<125>(31)<<(125 - posCero*5 + 20)));
-
 			eG = Estado24P(estadoComp, bitset<5>(posCero-5));
 			sucesores.push_back(ParEstadoAccion(a,eG));
 		}
@@ -223,7 +228,7 @@ public:
 		return sucesores;
 	}
 	//Pendiente
-	bitset<60> insertarEnPatron(bitset<60> p, bitset<5> v){
+	bitset<40> insertarEnPatron(bitset<40> p, bitset<5> v){
 		p <<= 5;
 		for(int j = 0; j<5 ; j++){
 			p[j] = v[j];
@@ -237,15 +242,15 @@ public:
 	//Funcion que determina la heuristica ---- PENDIENTE 24
 	int h(bitset<125> matriz, bitset<5> ubicacion0){
 		
-		bitset<60> patron1 = bitset<60>(0);
-		bitset<60> patron2 = bitset<60>(0);
-		bitset<60> patron3 = bitset<60>(0);
-		bitset<60> patron4 = bitset<60>(0);
-
+		bitset<40> patron1 = bitset<40>(0);
+		bitset<40> patron2 = bitset<40>(0);
+		bitset<40> patron3 = bitset<40>(0);
+		bitset<40> patron4 = bitset<40>(0);
+		bitset<40> patron5 = bitset<40>(0);
+		bitset<40> patron6 = bitset<40>(0);
 		bitset<125> temp = bitset<125>(0);
 		temp.set();
 		temp &= matriz;
-
 		//La heuristica esta basada en una pdb dividida en 4 patrones
 		// de 6 valores.
 		bitset<5> valor;
@@ -267,18 +272,25 @@ public:
 			// 6<= valor <11
 			// 11<= valor <16
 			valorI = valor.to_ulong();
-			if(valorI >= 1 && valorI < 7){
+
+			if(valorI >= 1 && valorI < 5){
 				patron1 = insertarEnPatron(patron1,valor);
 				patron1 = insertarEnPatron(patron1,indice);
-			}else if(valorI >= 7 && valorI < 13){
+			}else if(valorI >= 5 && valorI < 9){
 				patron2 = insertarEnPatron(patron2,valor);
 				patron2 = insertarEnPatron(patron2,indice);
-			}else if(valorI >= 13 && valorI < 19){
+			}else if(valorI >= 9 && valorI < 13){
 				patron3 = insertarEnPatron(patron3,valor);
 				patron3 = insertarEnPatron(patron3,indice);
-			}else if(valorI >= 19 && valorI < 25){
+			}else if(valorI >= 13 && valorI < 17){
 				patron4 = insertarEnPatron(patron4,valor);
 				patron4 = insertarEnPatron(patron4,indice);
+			}else if(valorI >= 17 && valorI < 21){
+				patron5 = insertarEnPatron(patron5,valor);
+				patron5 = insertarEnPatron(patron5,indice);
+			}else if(valorI >= 21 && valorI < 25){
+				patron6 = insertarEnPatron(patron6,valor);
+				patron6 = insertarEnPatron(patron6,indice);
 			}
 			temp >>= 5;
 
@@ -288,17 +300,21 @@ public:
 		int v2;
 		int v3;
 		int v4;
+		int v5;
+		int v6;
 
 		v1 = map1.at(fHashPDBA(patron1));
 		v2 = map2.at(fHashPDBA(patron2));
 		v3 = map3.at(fHashPDBA(patron3));
 		v4 = map4.at(fHashPDBA(patron4));
+		v5 = map5.at(fHashPDBA(patron5));
+		v6 = map6.at(fHashPDBA(patron6));
 
 
 
 		//Aqui se calcula el hash de los tres y se busca en las tablas
 		// para los valores.
-		return v1 + v2 + v3 + v4;
+		return v1 + v2 + v3 + v4 + v5 + v6;
 	
 	}
 //INCOMPLETO
@@ -405,7 +421,7 @@ public:
 
 	size_t calcularHashPDBArchivo(Estado24P e/*, int ignorar*/){
 
-		bitset<60> patron = bitset<60>(0);
+		bitset<40> patron = bitset<40>(0);
 
 
 		bitset<125> temp = bitset<125>(0);
@@ -556,20 +572,25 @@ public:
 	}
 
 	void generarHeuristicas(Estado24P ini) {
-		Estado24P patron1 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
-		Estado24P patron2 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
-		Estado24P patron3 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
-		Estado24P patron4 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
-		Estado24P patron5 = Estado24P(bitset<125>(1073741823),bitset<5>(0));
+		Estado24P patron1 = Estado24P(bitset<125>(1048575),bitset<5>(0));
+		Estado24P patron2 = Estado24P(bitset<125>(1048575),bitset<5>(0));
+		Estado24P patron3 = Estado24P(bitset<125>(1048575),bitset<5>(0));
+		Estado24P patron4 = Estado24P(bitset<125>(1048575),bitset<5>(0));
+		Estado24P patron5 = Estado24P(bitset<125>(1048575),bitset<5>(0));
+		Estado24P patron6 = Estado24P(bitset<125>(1048575),bitset<5>(0));
 
-		patron1.matriz <<= 90;
-		patron2.matriz <<= 60;
-		patron3.matriz <<= 30;
+		patron1.matriz <<= 100;
+		patron2.matriz <<= 80;
+		patron3.matriz <<= 60;
+		patron4.matriz <<= 40;
+		patron5.matriz <<= 20;
 
 		patron1.matriz &= ini.matriz;
 		patron2.matriz &= ini.matriz;
 		patron3.matriz &= ini.matriz;
 		patron4.matriz &= ini.matriz;
+		patron5.matriz &= ini.matriz;
+		patron6.matriz &= ini.matriz;
 
 		patron1.imprimirEstado();
 		cout << "\n";
@@ -578,15 +599,23 @@ public:
 		patron3.imprimirEstado();
 		cout << "\n";
 		patron4.imprimirEstado();
+		cout << "\n";
+		patron5.imprimirEstado();
+		cout << "\n";
+		patron6.imprimirEstado();
 
 		ofstream  archivop1;
 		ofstream archivop2;
 		ofstream archivop3;
 		ofstream archivop4;
+		ofstream archivop5;
+		ofstream archivop6;
 		archivop1.open ("archivop1-24P.txt");
 		archivop2.open("archivop2-24P.txt");
 		archivop3.open("archivop3-24P.txt");
 		archivop4.open("archivop4-24P.txt");
+		archivop5.open("archivop5-24P.txt");
+		archivop6.open("archivop6-24P.txt");
 
 		
 
@@ -595,24 +624,81 @@ public:
 		//ARCHIVO 1
 		generarPatron(archivop1,patron1);
 		cout << "paso1\n";
+		archivop1.close();
+
 		//ARCHIVO2
 		generarPatron(archivop2,patron2);
 		cout << "paso2\n";
-		
+		archivop2.close();
 		//ARCHIVO3
 		generarPatron(archivop3,patron3);
 		cout << "paso3\n";
-
+		archivop3.close();
 		//ARCHIVO4
 		generarPatron(archivop4,patron4);
 		cout << "paso4\n";
+		archivop4.close();
+		//ARCHIVO5
+		generarPatron(archivop5,patron5);
+		cout << "paso5\n";
+		archivop5.close();
+		//ARCHIVO6
+		generarPatron(archivop6,patron6);
+		cout << "paso6\n";
+		archivop6.close();
+			
 
-			archivop1.close();
-			archivop2.close();
-			archivop3.close();
-			archivop4.close();
 		};
 		
+};
+
+class Gen24P {
+public:
+
+	Gen24P(Estado24P inicial) {
+		ofstream  archivogen;
+		Accion24P accion = Accion24P();
+		archivogen.open ("archivoCasos.txt");
+		generar24P(inicial, 100, 0, accion, archivogen);
+		archivogen.close();
 	};
+
+	void generar24P(Estado24P nod,int l, int profundi, Accion24P acc, ofstream& fd){
+		vector<ParEstadoAccion> sucesores;
+		Modelo24P m = Modelo24P();
+		bitset<125> tempo;
+		bitset<125> mascara = bitset<125>(31);
+		mascara <<= 120;
+		bitset<125> para_escribir;
+		int encontrado;
+		int resultado;
+		int profundidad = profundi+1;
+		//int profundidad = 0;
+		
+		if(profundi > l) return;
+
+		sucesores = m.succ(nod.matriz, nod.ubicacion0);
+		for(int i = 0; i < sucesores.size();i++){
+			//if (i > 1) break;
+			if(profundi != 0){
+				if(!(m.esAccionInversa(acc.accion, sucesores[i].a.accion))){
+					tempo = sucesores[i].s.matriz;
+					for(int j=24; j >=0; j--) {
+						para_escribir = tempo & mascara;
+						para_escribir>>=120;
+						fd << para_escribir.to_ulong() << " ";
+						tempo<<=5;
+					}
+					fd << profundidad <<"\n";
+					generar24P(sucesores[i].s, l, profundidad, sucesores[i].a, fd);
+				}
+			}else{
+				generar24P(sucesores[i].s, l, profundidad, sucesores[i].a, fd);
+			}
+		}
+	}
+
+		
+};
 
 #endif

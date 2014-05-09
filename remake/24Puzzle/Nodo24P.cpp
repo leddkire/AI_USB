@@ -20,6 +20,7 @@ public:
 	Nodo(Estado24P e){
 		bitset<125> bit;
 		bitset<148> bit2;
+		bitset<125> temporal = e.matriz;
 		//Meter la ubicacion
 		
 		datos = bitset<148>(e.ubicacion0.to_ulong());
@@ -28,44 +29,47 @@ public:
 		//Meter primer cuarto del estado
 		bit= bitset<125>(4294967295);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(4294967295)));
 		datos <<= 31;
+		temporal >>= 32;
 
 		//Meter segundo cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
 		datos <<= 31;
+		temporal >>= 31;
 
 		//Meter tercer cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
 		datos <<= 31;
+		temporal >>= 31;
 
 		//Meter ultimo cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
-
 		padre = NULL;
 	}
 	//Constructor equivalente a make_node(Estado,Nodo,Accion)
 	Nodo (Estado24P e, Nodo *n, Accion24P a){
 		bitset<125> bit;
 		bitset<148> bit2;
+		bitset<125> temporal = e.matriz;
 
 		//Meter la profundidad
 		int profundidad = n -> getProf().to_ulong() + 1; 
@@ -75,51 +79,50 @@ public:
 		//Meter accion
 		bit2 = bitset<148>(a.accion.to_ulong());
 		datos = bit2 | (datos & ~(bitset<148>(3)));
-		//cout << "\n Datos despues de meter accion: " << datos << "\n";
 		datos <<= 5;
 
 		//Meter la ubicacion
 		bit2 = bitset<148>(e.ubicacion0.to_ulong());
 		datos = bit2 | (datos & ~(bitset<148>(31)));
-
-		//cout << "Datos despues de meter ubicacion: " << datos << "\n";
 		datos <<= 32;
 
 		//Meter primer cuarto del estado
 		bit= bitset<125>(4294967295);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(4294967295)));
 		datos <<= 31;
+		temporal >>= 32;
 
 		//Meter segundo cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
 		datos <<= 31;
+		temporal >>= 31;
 
 		//Meter tercer cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
 		datos <<= 31;
+		temporal >>= 31;
 
 		//Meter ultimo cuarto del estado
 		bit= bitset<125>(2147483647);
 		
-		bit &= e.matriz;
+		bit &= temporal;
 		bit2 = bitset<148>(bit.to_ulong());
 		
 		datos = bit2 | (datos & ~(bitset<148>(2147483647)));
-
 		padre = n;
 	}
 
@@ -159,24 +162,24 @@ public:
 		bitset<148> datos2;
 		bitset<125> temp2;
 		temp = datos & bitset<148>(2147483647);
+		
 		temp2 = bitset<125>(temp.to_ulong());
+
 		temp2 <<= 31;
-		//cout << "Primera mitad: " << temp2 << "\n";
+		
 		datos2 = datos >> 31;
 		temp = datos2 & bitset<148>(2147483647);
-
+		
 		temp2 = (bitset<125>(temp.to_ulong())) | (temp2 & ~(bitset<125>(2147483647)));
-
-		datos2 = datos >> 31;
+		datos2 = datos2 >> 31;
 		temp2 <<= 31;
 		temp = datos2 & bitset<148>(2147483647);
-
+		
 		temp2 = (bitset<125>(temp.to_ulong())) | (temp2 & ~(bitset<125>(2147483647)));
-
-		datos2 = datos >> 32;
+		datos2 = datos2 >> 31;
 		temp2 <<= 32;
 		temp = datos2 & bitset<148>(4294967295);
-		//cout << "Segunda mitad:"<< temp << "\n";
+		
 		temp2 = (bitset<125>(temp.to_ulong())) | (temp2 & ~(bitset<125>(4294967295)));
 		return temp2;
 	}

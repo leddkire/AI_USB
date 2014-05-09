@@ -13,8 +13,6 @@ int main(){
 		
 		i++;
 	}while(i < 25);
-
-	cout << estadoGoal << endl;
 	Estado24P goal = Estado24P(estadoGoal, bitset<5>(0));
 
 

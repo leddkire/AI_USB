@@ -43,6 +43,8 @@ int main(){
 	unordered_map<size_t,int> tabla2;
 	unordered_map<size_t,int> tabla3;
 	unordered_map<size_t,int> tabla4;
+	unordered_map<size_t,int> tabla5;
+	unordered_map<size_t,int> tabla6;
 
 	size_t hash;
 	int costo;
@@ -51,6 +53,8 @@ int main(){
 	ifstream p2;
 	ifstream p3;
 	ifstream p4;
+	ifstream p5;
+	ifstream p6;
 
 	int i = 1;
 	do{
@@ -111,6 +115,26 @@ int main(){
 		
 	}
 	p4.close();
+
+	p5.open("archivop5-24P.txt");
+	while(getline(p5,line)){
+		stringstream str(line);
+		str >> hash;
+		str >> costo;
+		tabla5.insert({hash,costo});
+		
+	}
+	p5.close();
+
+	p6.open("archivop6-24P.txt");
+	while(getline(p6,line)){
+		stringstream str(line);
+		str >> hash;
+		str >> costo;
+		tabla6.insert({hash,costo});
+		
+	}
+	p6.close();
 	cout<< "Se cargaron las tablas" << "\n";
 	//bitset<125> mascara = bitset<125>(18446744073709551615);
 	//long double dob = 0.0;
@@ -123,7 +147,7 @@ int main(){
 	std::chrono::duration<double> tTotal;
 	////
 	//Apertura de archivo (Mas tarde se pedira en vez de colocarse aqui)
-	file.open("24testsE.txt");
+	file.open("24tests.txt");
 	//No olvidar chequeo de errores
 
 
@@ -177,6 +201,8 @@ while(getline(file,line)){
 		}
 	}
 
+
+
 	//cout <<"\nRepresentacion del estado en base 2 y compactado:\n" << estadoComp << "\n";
 	//Creacion del nodo inicial
 	//cout << "\nEstado Inicial: \n\n";
@@ -184,8 +210,7 @@ while(getline(file,line)){
 	Estado24P E_inicial = Estado24P(estadoComp, ubicacion0);
 	init = Estado24P(estadoComp, ubicacion0);
 	Nodo* inicial = new Nodo(E_inicial);
-	
-	
+
 	//Creacion del estado objetivo
 	
 	//imprimirEstado(estadoGoal);
@@ -197,7 +222,7 @@ while(getline(file,line)){
 
 	//goal -> imprimirEstado();
 	//Creacion del modelo
-	Modelo24P modelo = Modelo24P(E_inicial, goal, tabla1, tabla2, tabla3, tabla4);
+	Modelo24P modelo = Modelo24P(E_inicial, goal, tabla1, tabla2, tabla3, tabla4, tabla5, tabla6);
 
 	//cout << "Distancia Manhattan: "<< dMan << "\n";
 	//cout << distanciaMan(estadoComp);
