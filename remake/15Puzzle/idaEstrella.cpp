@@ -22,6 +22,8 @@ public:
 		int limite = modelo.h(inicial -> getEstado(), inicial -> getUbicacion0());
 		int t;
 		int generados = 0;
+
+
 		while(1){
 			t = busquedaProfundidad(inicial,limite,&generados);
 			if(t==-1){
