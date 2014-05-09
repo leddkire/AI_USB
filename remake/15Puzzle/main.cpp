@@ -154,7 +154,7 @@ int main(){
 int probNum = 1;	
 
 	coutbuf = cout.rdbuf();
-	output.open("resultadosIdaPDB.txt");
+	output.open("resultadosIdaManhattan2.txt");
 	cout.rdbuf(output.rdbuf()); //Se cambia salida standard al archivo de salida
 	cout << "<id> : <problema> : <# nodos generados> <profundidad optima> <tiempo> <Nodos/seg>\n";
 
